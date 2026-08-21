@@ -1,5 +1,5 @@
 {
-  "name": "@kubor/agent-orb",
+  "name": "ai-orb",
   "version": "0.1.0",
   "description": "A tiny SVG orb that shows what your AI assistant is doing — thinking, working, waiting on you, done. Zero dependencies.",
   "keywords": [
@@ -16,13 +16,13 @@
   ],
   "license": "MIT",
   "author": "webkubor",
-  "homepage": "https://github.com/webkubor/agent-orb#readme",
+  "homepage": "https://github.com/webkubor/ai-orb#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/webkubor/agent-orb.git"
+    "url": "git+https://github.com/webkubor/ai-orb.git"
   },
   "bugs": {
-    "url": "https://github.com/webkubor/agent-orb/issues"
+    "url": "https://github.com/webkubor/ai-orb/issues"
   },
   "type": "module",
   "sideEffects": false,

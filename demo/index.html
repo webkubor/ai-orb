@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>agent-orb · AI 助手状态球</title>
+<title>ai-orb · AI 助手状态球</title>
 <!--
   零构建 demo：没有打包、没有 npm install，直接 import 源码就跑。
   这是这个库的一部分——README 里说「零依赖」，demo 就得真的证明它。
@@ -15,7 +15,7 @@
       npx serve .          # 或者
       python3 -m http.server 8080
 
-  在线版：https://webkubor.github.io/agent-orb/
+  在线版：https://webkubor.github.io/ai-orb/
 -->
 <style>
   :root { color-scheme: dark; }
@@ -76,7 +76,7 @@
 </head>
 <body>
 <div class="wrap">
-  <h1>agent-orb</h1>
+  <h1>ai-orb</h1>
   <p class="sub">
     一颗会表态的 AI 助手状态球。零依赖、纯 SVG ——
     这个页面就是证明：<code>没有构建、没有 npm install，直接 import 源码</code>。
@@ -102,7 +102,7 @@
 
   <section>
     <h2>30 秒上手</h2>
-    <pre>import { AgentOrb } from '@kubor/agent-orb'
+    <pre>import { AgentOrb } from 'ai-orb'
 
 const orb = new AgentOrb(document.querySelector('#orb'))
 
@@ -118,7 +118,7 @@ orb.destroy()            // 卸载时记得清理</pre>
   </section>
 
   <footer>
-    MIT · <a href="https://github.com/webkubor/agent-orb">github.com/webkubor/agent-orb</a>
+    MIT · <a href="https://github.com/webkubor/ai-orb">github.com/webkubor/ai-orb</a>
   </footer>
 </div>
 

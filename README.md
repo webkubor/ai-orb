@@ -1,4 +1,4 @@
-<h1 align="center">🔮 agent-orb</h1>
+<h1 align="center">🔮 ai-orb</h1>
 
 <p align="center">
   <strong>A tiny SVG orb that shows what your AI assistant is actually doing.</strong><br>
@@ -6,15 +6,15 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/npm/v/%40kubor%2Fagent-orb?style=for-the-badge&color=ff8a50" alt="npm">
-  <img src="https://img.shields.io/bundlephobia/minzip/%40kubor%2Fagent-orb?style=for-the-badge&color=ff8a50&label=gzipped" alt="size">
+  <img src="https://img.shields.io/npm/v/ai-orb?style=for-the-badge&color=ff8a50" alt="npm">
+  <img src="https://img.shields.io/bundlephobia/minzip/ai-orb?style=for-the-badge&color=ff8a50&label=gzipped" alt="size">
   <img src="https://img.shields.io/badge/dependencies-0-brightgreen?style=for-the-badge" alt="zero deps">
   <img src="https://img.shields.io/badge/license-MIT-blue?style=for-the-badge" alt="MIT">
   <img src="https://img.shields.io/badge/framework-agnostic-8b5cf6?style=for-the-badge" alt="framework agnostic">
 </p>
 
 <p align="center">
-  <a href="https://webkubor.github.io/agent-orb/"><strong>▶ Live demo</strong></a> ·
+  <a href="https://webkubor.github.io/ai-orb/"><strong>▶ Live demo</strong></a> ·
   <a href="./README.zh-CN.md">中文文档</a>
 </p>
 
@@ -53,11 +53,11 @@ they walked away, and nothing on screen admits it's stuck.
 ## ⚡ Quickstart
 
 ```bash
-npm i @kubor/agent-orb
+npm i ai-orb
 ```
 
 ```js
-import { AgentOrb } from '@kubor/agent-orb'
+import { AgentOrb } from 'ai-orb'
 
 const orb = new AgentOrb(document.querySelector('#orb'))
 
@@ -71,7 +71,7 @@ Vue 3:
 
 ```vue
 <script setup>
-import { AgentOrb } from '@kubor/agent-orb/vue'
+import { AgentOrb } from 'ai-orb/vue'
 </script>
 
 <template>
@@ -160,8 +160,8 @@ destroying the first orb turns every other one into an empty circle.
 ## 🛠 Local development
 
 ```bash
-git clone https://github.com/webkubor/agent-orb
-cd agent-orb
+git clone https://github.com/webkubor/ai-orb
+cd ai-orb
 npm install
 npm test
 

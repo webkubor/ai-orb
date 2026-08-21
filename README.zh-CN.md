@@ -1,4 +1,4 @@
-<h1 align="center">🔮 agent-orb</h1>
+<h1 align="center">🔮 ai-orb</h1>
 
 <p align="center">
   <strong>一颗会表态的 AI 助手状态球。</strong><br>
@@ -6,14 +6,14 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/npm/v/%40kubor%2Fagent-orb?style=for-the-badge&color=ff8a50" alt="npm">
-  <img src="https://img.shields.io/bundlephobia/minzip/%40kubor%2Fagent-orb?style=for-the-badge&color=ff8a50&label=gzipped" alt="size">
+  <img src="https://img.shields.io/npm/v/ai-orb?style=for-the-badge&color=ff8a50" alt="npm">
+  <img src="https://img.shields.io/bundlephobia/minzip/ai-orb?style=for-the-badge&color=ff8a50&label=gzipped" alt="size">
   <img src="https://img.shields.io/badge/dependencies-0-brightgreen?style=for-the-badge" alt="zero deps">
   <img src="https://img.shields.io/badge/license-MIT-blue?style=for-the-badge" alt="MIT">
 </p>
 
 <p align="center">
-  <a href="https://webkubor.github.io/agent-orb/"><strong>▶ 在线 demo</strong></a> ·
+  <a href="https://webkubor.github.io/ai-orb/"><strong>▶ 在线 demo</strong></a> ·
   <a href="./README.md">English</a>
 </p>
 
@@ -51,11 +51,11 @@ AI 产品难做的不是「加载中」，而是**每一种等待长得都一样
 ## ⚡ 30 秒上手
 
 ```bash
-npm i @kubor/agent-orb
+npm i ai-orb
 ```
 
 ```js
-import { AgentOrb } from '@kubor/agent-orb'
+import { AgentOrb } from 'ai-orb'
 
 const orb = new AgentOrb(document.querySelector('#orb'))
 
@@ -69,7 +69,7 @@ Vue 3：
 
 ```vue
 <script setup>
-import { AgentOrb } from '@kubor/agent-orb/vue'
+import { AgentOrb } from 'ai-orb/vue'
 </script>
 
 <template>
@@ -157,8 +157,8 @@ API 就这些。
 ## 🛠 本地开发
 
 ```bash
-git clone https://github.com/webkubor/agent-orb
-cd agent-orb
+git clone https://github.com/webkubor/ai-orb
+cd ai-orb
 npm install
 npm test
 
