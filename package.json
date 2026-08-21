@@ -1,5 +1,5 @@
 {
-  "name": "agent-orb",
+  "name": "@kubor/agent-orb",
   "version": "0.1.0",
   "description": "A tiny SVG orb that shows what your AI assistant is doing — thinking, working, waiting on you, done. Zero dependencies.",
   "keywords": [
@@ -43,6 +43,7 @@
     "src",
     "types",
     "README.md",
+    "README.zh-CN.md",
     "LICENSE"
   ],
   "peerDependencies": {

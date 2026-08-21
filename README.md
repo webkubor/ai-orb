@@ -6,8 +6,8 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/npm/v/agent-orb?style=for-the-badge&color=ff8a50" alt="npm">
-  <img src="https://img.shields.io/bundlephobia/minzip/agent-orb?style=for-the-badge&color=ff8a50&label=gzipped" alt="size">
+  <img src="https://img.shields.io/npm/v/%40kubor%2Fagent-orb?style=for-the-badge&color=ff8a50" alt="npm">
+  <img src="https://img.shields.io/bundlephobia/minzip/%40kubor%2Fagent-orb?style=for-the-badge&color=ff8a50&label=gzipped" alt="size">
   <img src="https://img.shields.io/badge/dependencies-0-brightgreen?style=for-the-badge" alt="zero deps">
   <img src="https://img.shields.io/badge/license-MIT-blue?style=for-the-badge" alt="MIT">
   <img src="https://img.shields.io/badge/framework-agnostic-8b5cf6?style=for-the-badge" alt="framework agnostic">
@@ -53,11 +53,11 @@ they walked away, and nothing on screen admits it's stuck.
 ## ⚡ Quickstart
 
 ```bash
-npm i agent-orb
+npm i @kubor/agent-orb
 ```
 
 ```js
-import { AgentOrb } from 'agent-orb'
+import { AgentOrb } from '@kubor/agent-orb'
 
 const orb = new AgentOrb(document.querySelector('#orb'))
 
@@ -71,7 +71,7 @@ Vue 3:
 
 ```vue
 <script setup>
-import { AgentOrb } from 'agent-orb/vue'
+import { AgentOrb } from '@kubor/agent-orb/vue'
 </script>
 
 <template>
