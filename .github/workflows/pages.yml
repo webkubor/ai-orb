@@ -1,0 +1,43 @@
+# README 里的「▶ Live demo」链接指向这里。
+# demo 直接 import src/ 源码，所以站点就是仓库本身——不需要构建，
+# 但 src/ 必须一起发上去，否则页面加载了却一颗球都没有。
+name: Deploy demo to Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 组装站点（demo 提到根，src 原样带上）
+        run: |
+          mkdir -p _site
+          cp demo/index.html _site/index.html
+          cp -r src _site/src
+          # demo 里写的是 ../src/index.js，提到根之后要改成 ./src/
+          sed -i "s|'../src/index.js'|'./src/index.js'|" _site/index.html
+          grep -q "'./src/index.js'" _site/index.html || { echo "::error::import 路径没改成功，线上会 404"; exit 1; }
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+      - id: deployment
+        uses: actions/deploy-pages@v4

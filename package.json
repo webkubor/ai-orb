@@ -1,0 +1,71 @@
+{
+  "name": "agent-orb",
+  "version": "0.1.0",
+  "description": "A tiny SVG orb that shows what your AI assistant is doing — thinking, working, waiting on you, done. Zero dependencies.",
+  "keywords": [
+    "ai",
+    "assistant",
+    "chatbot",
+    "avatar",
+    "svg",
+    "loading",
+    "status",
+    "indicator",
+    "vue",
+    "zero-dependency"
+  ],
+  "license": "MIT",
+  "author": "webkubor",
+  "homepage": "https://github.com/webkubor/agent-orb#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/webkubor/agent-orb.git"
+  },
+  "bugs": {
+    "url": "https://github.com/webkubor/agent-orb/issues"
+  },
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./types/index.d.ts",
+      "default": "./src/index.js"
+    },
+    "./vue": {
+      "types": "./types/vue.d.ts",
+      "default": "./src/vue.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "main": "./src/index.js",
+  "types": "./types/index.d.ts",
+  "files": [
+    "src",
+    "types",
+    "README.md",
+    "LICENSE"
+  ],
+  "peerDependencies": {
+    "vue": "^3.3.0"
+  },
+  "peerDependenciesMeta": {
+    "vue": {
+      "optional": true
+    }
+  },
+  "scripts": {
+    "test": "node --test \"test/**/*.test.js\"",
+    "demo": "node -e \"console.log('打开 demo/index.html 即可，零构建。')\""
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "devDependencies": {
+    "@vue/server-renderer": "^3.5.41",
+    "jsdom": "^30.0.1",
+    "vue": "^3.5.41"
+  }
+}

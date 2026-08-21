@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>agent-orb · AI 助手状态球</title>
+<!--
+  零构建 demo：没有打包、没有 npm install，直接 import 源码就跑。
+  这是这个库的一部分——README 里说「零依赖」，demo 就得真的证明它。
+
+  ⚠️ 需要经 http 打开，不能双击 file://。
+  ES module 在 file:// 下会被 CORS 拦掉（origin 为 null，Chrome 只允许 http/https 等协议），
+  表现是「页面出来了但一颗球都没有」，很容易被当成库坏了。
+
+      npx serve .          # 或者
+      python3 -m http.server 8080
+
+  在线版：https://webkubor.github.io/agent-orb/
+-->
+<style>
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; min-height: 100vh; padding: 48px 24px 80px;
+    background: #14110e; color: #f2ece5;
+    font: 15px/1.7 -apple-system, BlinkMacSystemFont, "PingFang SC", "Segoe UI", sans-serif;
+    background-image:
+      radial-gradient(900px 400px at 80% -10%, rgba(255,138,80,.07), transparent 60%),
+      radial-gradient(700px 400px at 10% 110%, rgba(217,185,106,.05), transparent 60%);
+  }
+  .wrap { max-width: 940px; margin: 0 auto; }
+  h1 { font-size: 30px; margin: 0 0 6px; letter-spacing: -.01em; }
+  .sub { color: #a89e93; margin: 0 0 44px; }
+  .sub code { background: rgba(255,255,255,.06); padding: 2px 6px; border-radius: 4px; font-size: 13px; }
+
+  h2 { font-size: 13px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: #7d746a; margin: 0 0 18px; }
+  section { margin-bottom: 52px; }
+
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(132px, 1fr)); gap: 14px; }
+  .cell {
+    display: grid; justify-items: center; gap: 12px;
+    padding: 26px 12px 18px; border: 1px solid rgba(255,255,255,.06);
+    border-radius: 14px; background: rgba(255,255,255,.02);
+  }
+  .cell b { font-size: 13px; font-weight: 600; }
+  .cell small { color: #7d746a; font-size: 11.5px; text-align: center; line-height: 1.5; }
+
+  .stage {
+    display: flex; align-items: center; gap: 22px; flex-wrap: wrap;
+    padding: 26px; border: 1px solid rgba(255,255,255,.06); border-radius: 14px;
+    background: rgba(255,255,255,.02);
+  }
+  .stage-copy { flex: 1; min-width: 220px; }
+  .stage-copy p { margin: 0 0 4px; }
+  .stage-copy small { color: #7d746a; }
+  .btns { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
+  button.pick {
+    padding: 7px 14px; border-radius: 999px; cursor: pointer; font: inherit; font-size: 13px;
+    border: 1px solid rgba(255,255,255,.12); background: transparent; color: #a89e93;
+  }
+  button.pick:hover { border-color: #ff8a50; color: #ffa270; }
+  button.pick.on { background: #ff8a50; border-color: #ff8a50; color: #1a120c; font-weight: 600; }
+
+  pre {
+    margin: 0; padding: 18px 20px; overflow-x: auto;
+    border: 1px solid rgba(255,255,255,.06); border-radius: 12px;
+    background: rgba(0,0,0,.28); font-size: 13px; line-height: 1.75;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace; color: #d6cec4;
+  }
+  .theme-row { display: flex; gap: 30px; flex-wrap: wrap; align-items: center; }
+  .theme { display: grid; justify-items: center; gap: 10px; }
+  .theme small { color: #7d746a; font-size: 11.5px; }
+  footer { margin-top: 60px; color: #5f574f; font-size: 12.5px; text-align: center; }
+  footer a { color: #a89e93; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>agent-orb</h1>
+  <p class="sub">
+    一颗会表态的 AI 助手状态球。零依赖、纯 SVG ——
+    这个页面就是证明：<code>没有构建、没有 npm install，直接 import 源码</code>。
+    <br>把鼠标在页面上移动，它们都会看着你。
+  </p>
+
+  <section>
+    <h2>六个状态</h2>
+    <div class="grid" id="grid"></div>
+  </section>
+
+  <section>
+    <h2>试试看</h2>
+    <div class="stage">
+      <div id="playground"></div>
+      <div class="stage-copy">
+        <p id="playDesc">待命。只呼吸，不做别的——它是常驻状态，多余动效会变成噪音。</p>
+        <small id="playCode">orb.state = 'idle'</small>
+        <div class="btns" id="picks"></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>30 秒上手</h2>
+    <pre>import { AgentOrb } from 'agent-orb'
+
+const orb = new AgentOrb(document.querySelector('#orb'))
+
+orb.state = 'thinking'   // 模型在想
+orb.state = 'working'    // 长任务跑着，环在转
+orb.set('done', 3)       // 好了，角标 3
+orb.destroy()            // 卸载时记得清理</pre>
+  </section>
+
+  <section>
+    <h2>换主题：改 CSS 变量就行</h2>
+    <div class="theme-row" id="themes"></div>
+  </section>
+
+  <footer>
+    MIT · <a href="https://github.com/webkubor/agent-orb">github.com/webkubor/agent-orb</a>
+  </footer>
+</div>
+
+<script type="module">
+import { AgentOrb } from '../src/index.js'
+
+const STATES = [
+  ['idle',     '待命',     '只呼吸。常驻状态，多余动效会变成噪音。'],
+  ['thinking', '在想',     '呼吸加快、眼神朝上、头顶三点依次亮。'],
+  ['working',  '干活中',   '环在转。全库唯一持续旋转的元素，留给最长的等待。'],
+  ['asking',   '等你回话', '轻轻左右摆，像在视线边上晃手。比闪烁礼貌。'],
+  ['done',     '好了',     '弹一次就回到呼吸，不持续抢注意力。'],
+  ['error',    '出错了',   '褪成灰，不闪不抖。闪红只会让人紧张。'],
+]
+
+// 六宫格
+const grid = document.getElementById('grid')
+for (const [state, name, desc] of STATES) {
+  const cell = document.createElement('div')
+  cell.className = 'cell'
+  const slot = document.createElement('div')
+  cell.append(slot)
+  const b = document.createElement('b'); b.textContent = name
+  const s = document.createElement('small'); s.textContent = desc
+  cell.append(b, s)
+  grid.append(cell)
+  new AgentOrb(slot, { state, unseen: state === 'done' ? 3 : 0 })
+}
+
+// 试试看
+const play = new AgentOrb(document.getElementById('playground'), { size: 76 })
+const picks = document.getElementById('picks')
+const desc = document.getElementById('playDesc')
+const code = document.getElementById('playCode')
+for (const [state, name, d] of STATES) {
+  const btn = document.createElement('button')
+  btn.className = 'pick' + (state === 'idle' ? ' on' : '')
+  btn.textContent = name
+  btn.onclick = () => {
+    play.set(state, state === 'done' ? 5 : 0)
+    desc.textContent = d
+    code.textContent = state === 'done' ? "orb.set('done', 5)" : `orb.state = '${state}'`
+    picks.querySelectorAll('.pick').forEach((x) => x.classList.toggle('on', x === btn))
+  }
+  picks.append(btn)
+}
+
+// 主题：全靠 CSS 变量，核心代码一行没改
+const THEMES = [
+  ['默认暖橙', {}],
+  ['青蓝', { '--ao-hi': '#a5e9ff', '--ao-mid': '#3aa8d8', '--ao-lo': '#1c6a94', '--ao-glow': '#3aa8d8', '--ao-ink': '#0d2733' }],
+  ['薄荷', { '--ao-hi': '#c8f5d8', '--ao-mid': '#4cb782', '--ao-lo': '#2b7a55', '--ao-glow': '#4cb782', '--ao-ink': '#0f2b1d' }],
+  ['紫罗兰', { '--ao-hi': '#dcc8ff', '--ao-mid': '#8b5cf6', '--ao-lo': '#5b32b8', '--ao-glow': '#8b5cf6', '--ao-ink': '#1e1233' }],
+  ['石墨', { '--ao-hi': '#e8e8e8', '--ao-mid': '#8a8a8a', '--ao-lo': '#4a4a4a', '--ao-glow': '#8a8a8a', '--ao-ink': '#1a1a1a' }],
+]
+const themes = document.getElementById('themes')
+for (const [name, vars] of THEMES) {
+  const box = document.createElement('div')
+  box.className = 'theme'
+  const slot = document.createElement('div')
+  const cap = document.createElement('small'); cap.textContent = name
+  box.append(slot, cap)
+  themes.append(box)
+  const o = new AgentOrb(slot, { state: 'working' })
+  for (const [k, v] of Object.entries(vars)) o.el.style.setProperty(k, v)
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,46 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm install
+      - run: npm test
+
+  # README 承诺了「零依赖」和「4 KB」。这两条一旦跑偏，是最伤信任的那种偏——
+  # 用户是冲着这个装的。所以让 CI 盯着，而不是靠记得。
+  promises:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: 运行时依赖必须为零
+        run: |
+          deps=$(node -p "Object.keys(require('./package.json').dependencies || {}).length")
+          echo "dependencies: $deps"
+          if [ "$deps" != "0" ]; then
+            echo "::error::README 写着 zero dependencies，但 package.json 里有 $deps 个运行时依赖"
+            exit 1
+          fi
+
+      - name: gzip 后不得超过 6 KB
+        run: |
+          npx --yes esbuild src/index.js --bundle --minify --format=esm --outfile=/tmp/ao.js --log-level=error
+          size=$(gzip -9 -c /tmp/ao.js | wc -c)
+          echo "gzipped: $size bytes"
+          if [ "$size" -gt 6144 ]; then
+            echo "::error::体积涨到 $size 字节，超过 6 KB 上限。要么瘦回去，要么改 README 里的数字"
+            exit 1
+          fi
