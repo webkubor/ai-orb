@@ -54,7 +54,7 @@
     }
   },
   "scripts": {
-    "test": "node --test \"test/**/*.test.js\"",
+    "test": "node --test test/*.test.js",
     "demo": "node -e \"console.log('打开 demo/index.html 即可，零构建。')\""
   },
   "engines": {
