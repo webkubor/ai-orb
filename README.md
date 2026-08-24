@@ -1,8 +1,8 @@
 <h1 align="center">🔮 ai-orb</h1>
 
 <p align="center">
-  <strong>A tiny SVG orb that shows what your AI assistant is actually doing.</strong><br>
-  Thinking · working · waiting on you · done. Zero dependencies, 4 KB.
+  <strong>一颗会表态的 AI 助手状态球。</strong><br>
+  在想 · 干活中 · 等你回话 · 好了。零依赖，4 KB。
 </p>
 
 <p align="center">
@@ -14,43 +14,39 @@
 </p>
 
 <p align="center">
-  <a href="https://webkubor.github.io/ai-orb/"><strong>▶ Live demo</strong></a> ·
-  <a href="./README.zh-CN.md">中文文档</a>
+  <a href="https://webkubor.github.io/ai-orb/"><strong>▶ 在线 Demo</strong></a> ·
+  <a href="./README.en.md">English</a>
 </p>
 
 ---
 
-## 🏆 Why not just a spinner?
+## 看一眼就知道它在干嘛
 
-The hard part of AI UX isn't the loading — it's that **every kind of waiting looks identical**.
+<p align="center">
+  <img src="./demo/preview.png" width="680" alt="ai-orb 六个状态预览">
+</p>
 
-|                          | agent-orb | Spinner | Unread badge | Lottie animation |
-| ------------------------ | :-------: | :-----: | :----------: | :--------------: |
-| Tells thinking vs working|     ✅    |    ❌   |      ❌      |        ❌        |
-| Shows "I'm waiting on **you**" | ✅  |    ❌   |      ❌      |        ❌        |
-| Survives a 60s image gen |     ✅    |  😵 feels frozen |  ❌   |        ✅        |
-| Zero dependencies        |     ✅    |    ✅   |      ✅      |  ❌ ~250 KB lib  |
-| Themeable via CSS vars   |     ✅    |    ✅   |      ✅      |  ❌ re-export JSON |
-| Respects reduced-motion  |     ✅    |   ⚠️    |      ✅      |        ⚠️        |
+| 状态 | 什么时候亮 | 表现 |
+|---|---|---|
+| `idle` | 默认 | 缓慢呼吸，常驻 |
+| `thinking` | 请求发了，还没吐字 | 呼吸加快，眼神朝上，头顶三点闪 |
+| `working` | 长任务（出图、工具调用） | 一条环在转，唯一持续旋转的元素 |
+| `asking` | 助手问了话，卡在你这儿 | 轻轻左右摆，像在你视线边上晃手 |
+| `done` | 结果出来了 | 弹一下、笑眼、角标 |
+| `error` | 请求失败 | 褪成灰，不闪红 |
 
-A spinner says "something is happening." An orb says **which** something — and when
-the model has stopped and is quietly waiting for your answer, it says that too.
-That last state is the one users miss most: the assistant asked a question,
-they walked away, and nothing on screen admits it's stuck.
+## 八色主题
 
-## 🔥 Highlights
+```js
+new AgentOrb(el, { theme: 'blue' })  // 创建时选
+orb.theme = 'violet'                  // 运行时秒切
+```
 
-- **🧠 Six states, each earned** — `idle` `thinking` `working` `asking` `done` `error`.
-  No decorative extras: every state maps to something your app actually knows.
-- **👀 It looks at you** — eyes track the cursor with 1.6px of travel. Small enough
-  that nobody calls it an animation, big enough that everybody feels it.
-- **🪶 4 KB, zero deps** — plain SVG + vanilla JS. Works in React, Vue, Svelte,
-  or a bare `<script type="module">`.
-- **🎨 Themed with CSS variables** — five lines to recolor. No build step, no config file.
-- **♿ Accessible by default** — every state carries an `aria-label`, and
-  `prefers-reduced-motion` stops all animation while keeping the state readable.
+| 🟠 orange | 🔵 blue | 🟢 green | 🟣 violet | 🔴 rose | 🟡 gold | 🩵 cyan | ⚫ graphite |
+|---|---|---|---|---|---|---|---|
+| 默认 | `#3aa8d8` | `#4cb782` | `#8b5cf6` | `#ef5350` | `#f5b800` | `#22d3ee` | `#8a8a8a` |
 
-## ⚡ Quickstart
+## 30 秒上手
 
 ```bash
 npm i ai-orb
@@ -61,14 +57,14 @@ import { AgentOrb } from 'ai-orb'
 
 const orb = new AgentOrb(document.querySelector('#orb'), { theme: 'blue' })
 
-orb.state = 'thinking'   // model is composing
-orb.state = 'working'    // long job running — the ring spins
-orb.theme = 'violet'     // swap theme at runtime
-orb.set('done', 3)       // finished, with an unread badge
-orb.destroy()            // always clean up on unmount
+orb.state = 'thinking'   // 模型在想
+orb.state = 'working'    // 长任务跑着，环在转
+orb.theme = 'violet'     // 运行时换色
+orb.set('done', 3)       // 好了，角标 3
+orb.destroy()            // 卸载时记得清理
 ```
 
-Vue 3:
+Vue 3：
 
 ```vue
 <script setup>
@@ -80,106 +76,71 @@ import { AgentOrb } from 'ai-orb/vue'
 </template>
 ```
 
-That's the whole API.
+API 就这些。
 
-## 🎭 The six states
+## 🎨 换肤
 
-| State      | When to set it                                   | What it does                                       |
-| ---------- | ------------------------------------------------ | -------------------------------------------------- |
-| `idle`     | Default                                          | Breathes slowly. Nothing else — it's always on screen. |
-| `thinking` | Request sent, no tokens yet                      | Faster breathing, eyes drift up, three dots pulse.  |
-| `working`  | A long task is running (image gen, tool call)    | A ring orbits. The only continuous spin in the library. |
-| `asking`   | Assistant asked something and is blocked on you  | Rocks gently, like a wave at the edge of your vision. |
-| `done`     | Result delivered while the panel is collapsed    | Pops once, smiles, shows the badge. Then settles.   |
-| `error`    | Request failed                                   | Fades to grey. No flashing red — that just makes people tense. |
-
-Unknown values fall back to `idle` instead of throwing. State usually comes from a
-backend, and one typo shouldn't blank the page.
-
-## 🎨 Theming
-
-Eight built-in themes, one option:
-
-```js
-const orb = new AgentOrb(el, { theme: 'blue' })   // set at creation
-orb.theme = 'violet'                                // change at runtime
-orb.theme = null                                    // back to CSS defaults
-```
-
-| Name | Preview | `--ao-mid` |
-| --- | --- | --- |
-| `orange` | 🟠 | `#ff8a50` |
-| `blue` | 🔵 | `#3aa8d8` |
-| `green` | 🟢 | `#4cb782` |
-| `violet` | 🟣 | `#8b5cf6` |
-| `rose` | 🔴 | `#ef5350` |
-| `gold` | 🟡 | `#f5b800` |
-| `cyan` | 🩵 | `#22d3ee` |
-| `graphite` | ⚫ | `#8a8a8a` |
-
-Themes are CSS variables under the hood. Override any variable on the element
-(or any ancestor) for fine-grained control:
+主题底层是 CSS 变量，要细调的话在元素上覆盖：
 
 ```css
 .agent-orb {
   --ao-size: 64px;
-  --ao-hi:   #a5e9ff;   /* inner highlight  */
-  --ao-mid:  #3aa8d8;   /* body             */
-  --ao-lo:   #1c6a94;   /* outer edge       */
-  --ao-glow: #3aa8d8;   /* halo             */
-  --ao-ink:  #0d2733;   /* eyes             */
+  --ao-hi:   #a5e9ff;   /* 内高光 */
+  --ao-mid:  #3aa8d8;   /* 球身   */
+  --ao-lo:   #1c6a94;   /* 外缘   */
+  --ao-glow: #3aa8d8;   /* 光晕   */
+  --ao-ink:  #0d2733;   /* 眼睛   */
 }
 ```
 
-| Variable | Default | Purpose |
+| 变量 | 默认值 | 作用 |
 | --- | --- | --- |
-| `--ao-size` | `56px` | Overall size |
-| `--ao-hi` / `--ao-mid` / `--ao-lo` | warm orange | Radial gradient, inner → outer |
-| `--ao-glow` | `#ff8a50` | Halo colour (states override this) |
-| `--ao-ink` | `#2a1a10` | Eye colour |
-| `--ao-badge-bg` / `--ao-badge-fg` / `--ao-badge-ring` | — | Unread badge |
+| `--ao-size` | `56px` | 整体尺寸 |
+| `--ao-hi` / `--ao-mid` / `--ao-lo` | 暖橙 | 径向渐变，由内到外 |
+| `--ao-glow` | `#ff8a50` | 光晕色（各状态会覆盖） |
+| `--ao-ink` | `#2a1a10` | 眼睛颜色 |
+| `--ao-badge-bg` / `--ao-badge-fg` / `--ao-badge-ring` | — | 未读角标 |
 
 ## 📖 API
 
 ### `new AgentOrb(host, options?)`
 
-`host` is a mount point — the orb is **appended** to it, not swapped in.
-Throws if `host` is missing (silent failure gets misdiagnosed as a CSS problem).
+`host` 是挂载点 —— 球会**追加**进去，不会替换掉它本身。
+`host` 为空时直接抛错（静默失败会被当成样式问题查半天）。
 
-| Option | Type | Default | Notes |
+| 参数 | 类型 | 默认 | 说明 |
 | --- | --- | --- | --- |
-| `state` | `OrbState` | `'idle'` | Unknown values fall back to `idle` |
-| `unseen` | `number` | `0` | Badge shows only when `state === 'done'` and `> 0` |
-| `size` | `number \| string` | — | Numbers are treated as px |
-| `follow` | `boolean` | `true` | Cursor tracking |
-| `blink` | `boolean` | `true` | Blinking |
-| `theme` | `string \| null` | `null` | Built-in theme name (see above) |
-| `labels` | `object` | English | Override `aria-label` text for i18n |
-| `onClick` | `function` | — | Click handler |
+| `state` | `OrbState` | `'idle'` | 未知值回落到 `idle` |
+| `unseen` | `number` | `0` | 仅 `state === 'done'` 且 `> 0` 时显示角标 |
+| `size` | `number \| string` | — | 数字按 px 处理 |
+| `follow` | `boolean` | `true` | 眼睛跟随光标 |
+| `blink` | `boolean` | `true` | 眨眼 |
+| `theme` | `string \| null` | `null` | 内置主题名（见上表） |
+| `labels` | `object` | 英文 | 覆盖 `aria-label` 文案，做多语言用 |
+| `onClick` | `function` | — | 点击回调 |
 
-**Instance:** `orb.state`, `orb.unseen` (both settable), `orb.set(state, unseen?)`,
-`orb.destroy()`, `orb.el` (the button — use it to set CSS variables).
+**实例：** `orb.state`、`orb.unseen`、`orb.theme`（都可写）、`orb.set(state, unseen?)`、
+`orb.destroy()`、`orb.el`（那个 button，用它设 CSS 变量）。
 
-**Also exported:** `STATES`, `DEFAULT_LABELS`, `THEMES`, `css`, `injectStyle(doc?)`.
+**另外导出：** `STATES`、`DEFAULT_LABELS`、`THEMES`、`css`、`injectStyle(doc?)`。
 
-Styles auto-inject once per page. Import `css` instead if you manage styles
-yourself (SSR, strict CSP, or a custom theme pipeline).
+样式每页自动注入一次。要自己管样式（SSR、严格 CSP、自定义主题流水线）就
+改成引入 `css` 字符串。
 
-## 🔬 Design notes
+## 设计上的三条克制
 
-Three deliberate limits — they're choices, not an unfinished roadmap:
+都是有意为之，不是还没做完：
 
-1. **Only six states.** More states you can't tell apart at 56px is worse than fewer you can.
-2. **Only one thing spins.** The ring is reserved for `working`, the longest wait.
-   If everything moved, nothing would read as urgent.
-3. **No cartoon face.** It has to sit in the corner of a serious product without
-   becoming the loudest thing on screen.
+1. **只有六个状态。** 56px 下分不清的状态再多也没用，不如少而清楚。
+2. **只有一样东西在转。** 环只留给 `working`——最长的那段等待。
+   什么都在动，就等于什么都不紧急。
+3. **不做卡通脸。** 它得能待在正经产品的角落里，而不是变成屏幕上最吵的东西。
 
-Multiple orbs on one page share a single `mousemove` listener and one `requestAnimationFrame`
-loop; the last `destroy()` unbinds both. Gradient IDs are per-instance — with a shared ID,
-destroying the first orb turns every other one into an empty circle.
+同页多颗球共用一个 `mousemove` 监听和一个 `requestAnimationFrame` 循环，
+最后一个 `destroy()` 时一起摘掉。渐变 id 按实例区分——共用 id 的话，
+销毁第一颗会让其余的全变成空心圈。
 
-## 🛠 Local development
+## 本地开发
 
 ```bash
 git clone https://github.com/webkubor/ai-orb
@@ -187,19 +148,18 @@ cd ai-orb
 npm install
 npm test
 
-npx serve .   # then open http://localhost:3000/demo/
+npx serve .   # 然后开 http://localhost:3000/demo/
 ```
 
-The demo imports the source directly — no build step. It must be served over HTTP:
-ES modules are blocked on `file://` by CORS, which shows up as "the page loads but
-there are no orbs."
+demo 直接 import 源码，没有构建步骤。但**必须经 http 打开**：
+ES module 在 `file://` 下会被 CORS 拦掉，表现是「页面出来了但一颗球都没有」。
 
-## 📦 Used by
+## 谁在用
 
-- [MUSE AV](https://www.museav.top) — AI image studio. The orb is the collapsed state of
-  its creation assistant, where image generation routinely takes 30–90 seconds.
+- [MUSE AV](https://www.museav.top) —— AI 出图工作台。这颗球是它创作助手的收起态，
+  那里出一张图经常要 30–90 秒。
 
-Using it somewhere? Open a PR and add yourself.
+你也在用？欢迎提 PR 加上。
 
 ## License
 
