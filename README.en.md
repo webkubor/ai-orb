@@ -7,6 +7,7 @@
 
 <p align="center">
   <img src="https://img.shields.io/npm/v/ai-orb?style=for-the-badge&color=ff8a50" alt="npm">
+  <img src="https://img.shields.io/npm/dm/ai-orb?style=for-the-badge&color=ff8a50&label=downloads" alt="monthly downloads">
   <img src="https://img.shields.io/bundlephobia/minzip/ai-orb?style=for-the-badge&color=ff8a50&label=gzipped" alt="size">
   <img src="https://img.shields.io/badge/dependencies-0-brightgreen?style=for-the-badge" alt="zero deps">
   <img src="https://img.shields.io/badge/license-MIT-blue?style=for-the-badge" alt="MIT">
