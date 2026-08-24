@@ -71,6 +71,19 @@ function leave(orb) {
   }
 }
 
+/** 内置主题预设。每个对象是 { --ao-hi, --ao-mid, --ao-lo, --ao-glow, --ao-ink }。
+ *  用法：new AgentOrb(el, { theme: 'blue' }) 或 orb.theme = 'blue'。 */
+export const THEMES = {
+  orange:  { '--ao-hi': '#ffc79a', '--ao-mid': '#ff8a50', '--ao-lo': '#e8632f', '--ao-glow': '#ff8a50', '--ao-ink': '#2a1a10' },
+  blue:    { '--ao-hi': '#a5e9ff', '--ao-mid': '#3aa8d8', '--ao-lo': '#1c6a94', '--ao-glow': '#3aa8d8', '--ao-ink': '#0d2733' },
+  green:   { '--ao-hi': '#c8f5d8', '--ao-mid': '#4cb782', '--ao-lo': '#2b7a55', '--ao-glow': '#4cb782', '--ao-ink': '#0f2b1d' },
+  violet:  { '--ao-hi': '#dcc8ff', '--ao-mid': '#8b5cf6', '--ao-lo': '#5b32b8', '--ao-glow': '#8b5cf6', '--ao-ink': '#1e1233' },
+  rose:    { '--ao-hi': '#ffd0d0', '--ao-mid': '#ef5350', '--ao-lo': '#b82e2e', '--ao-glow': '#ef5350', '--ao-ink': '#2a1515' },
+  gold:    { '--ao-hi': '#fff3c4', '--ao-mid': '#f5b800', '--ao-lo': '#b88800', '--ao-glow': '#f5b800', '--ao-ink': '#2a2200' },
+  cyan:    { '--ao-hi': '#c8f7ff', '--ao-mid': '#22d3ee', '--ao-lo': '#0e7490', '--ao-glow': '#22d3ee', '--ao-ink': '#082f38' },
+  graphite:{ '--ao-hi': '#e8e8e8', '--ao-mid': '#8a8a8a', '--ao-lo': '#4a4a4a', '--ao-glow': '#8a8a8a', '--ao-ink': '#1a1a1a' },
+}
+
 export class AgentOrb {
   /**
    * @param {Element} host 挂载点。球会作为它的子节点插入（host 本身不被替换）。
@@ -80,6 +93,7 @@ export class AgentOrb {
    * @param {number|string} [opts.size] 尺寸，数字按 px；不传则用 CSS 的 56px
    * @param {boolean} [opts.follow=true] 眼睛是否跟随鼠标
    * @param {boolean} [opts.blink=true]  是否眨眼
+   * @param {string} [opts.theme]       内置主题名（THEMES 的 key），不传则用 CSS 默认值
    * @param {object} [opts.labels]      覆盖无障碍文案（做多语言时用）
    * @param {(e: MouseEvent) => void} [opts.onClick]
    * @param {Document} [opts.document]  自定义 document（测试 / 多窗口场景）
@@ -99,8 +113,11 @@ export class AgentOrb {
     this._blinkTimer = 0
     this._destroyed = false
 
+    this._theme = opts.theme || null
+
     injectStyle(doc)
     this._build(host, opts)
+    this._applyTheme()
     this._render()
 
     if (this._follow) join(this)
@@ -115,6 +132,15 @@ export class AgentOrb {
     if (next === this._state) return
     this._state = next
     this._render()
+  }
+
+  /** 当前主题名。设新值立即生效：orb.theme = 'blue'。 */
+  get theme() { return this._theme }
+  set theme(v) {
+    const name = v && THEMES[v] ? v : null
+    if (name === this._theme) return
+    this._theme = name
+    this._applyTheme()
   }
 
   get unseen() { return this._unseen }
@@ -207,6 +233,14 @@ export class AgentOrb {
     el.title = label
   }
 
+  /** 把主题变量写到元素上。没主题时清掉，恢复 CSS 默认值。 */
+  _applyTheme() {
+    const vars = THEMES[this._theme]
+    for (const k of ['--ao-hi', '--ao-mid', '--ao-lo', '--ao-glow', '--ao-ink']) {
+      this.el.style.setProperty(k, vars ? vars[k] : '')
+    }
+  }
+
   /** 每帧把眼睛朝鼠标收一点。最大偏移 1.6px（球半径 22）——
    *  小到不会被当成动画，但人一眼就觉得「它看着我」。 */
   _frame() {
@@ -241,3 +275,4 @@ export class AgentOrb {
 
 export { css, injectStyle } from './style.js'
 export default AgentOrb
+

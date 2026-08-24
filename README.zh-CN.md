@@ -57,10 +57,11 @@ npm i ai-orb
 ```js
 import { AgentOrb } from 'ai-orb'
 
-const orb = new AgentOrb(document.querySelector('#orb'))
+const orb = new AgentOrb(document.querySelector('#orb'), { theme: 'blue' })
 
 orb.state = 'thinking'   // 模型在想
 orb.state = 'working'    // 长任务跑着，环在转
+orb.theme = 'violet'     // 运行时换主题
 orb.set('done', 3)       // 好了，带未读角标
 orb.destroy()            // 卸载时一定要清理
 ```
@@ -73,7 +74,7 @@ import { AgentOrb } from 'ai-orb/vue'
 </script>
 
 <template>
-  <AgentOrb :state="state" :unseen="n" @click="openChat" />
+  <AgentOrb :state="state" :unseen="n" :theme="theme" @click="openChat" />
 </template>
 ```
 
@@ -95,7 +96,26 @@ API 就这些。
 
 ## 🎨 换肤
 
-全是 CSS 变量，在元素上（或任意祖先上）覆盖即可：
+八个内置主题，一行代码：
+
+```js
+const orb = new AgentOrb(el, { theme: 'blue' })   // 创建时设
+orb.theme = 'violet'                                // 运行时换
+orb.theme = null                                    // 回到 CSS 默认值
+```
+
+| 主题名 | 预览 | `--ao-mid` |
+| --- | --- | --- |
+| `orange` | 🟠 | `#ff8a50` |
+| `blue` | 🔵 | `#3aa8d8` |
+| `green` | 🟢 | `#4cb782` |
+| `violet` | 🟣 | `#8b5cf6` |
+| `rose` | 🔴 | `#ef5350` |
+| `gold` | 🟡 | `#f5b800` |
+| `cyan` | 🩵 | `#22d3ee` |
+| `graphite` | ⚫ | `#8a8a8a` |
+
+主题底层就是 CSS 变量。要细调的话，在元素上（或任意祖先上）覆盖即可：
 
 ```css
 .agent-orb {
@@ -130,13 +150,14 @@ API 就这些。
 | `size` | `number \| string` | — | 数字按 px 处理 |
 | `follow` | `boolean` | `true` | 眼睛跟随光标 |
 | `blink` | `boolean` | `true` | 眨眼 |
+| `theme` | `string \| null` | `null` | 内置主题名（见上表） |
 | `labels` | `object` | 英文 | 覆盖 `aria-label` 文案，做多语言用 |
 | `onClick` | `function` | — | 点击回调 |
 
 **实例：** `orb.state`、`orb.unseen`（都可写）、`orb.set(state, unseen?)`、
 `orb.destroy()`、`orb.el`（那个 button，用它设 CSS 变量）。
 
-**另外导出：** `STATES`、`DEFAULT_LABELS`、`css`、`injectStyle(doc?)`。
+**另外导出：** `STATES`、`DEFAULT_LABELS`、`THEMES`、`css`、`injectStyle(doc?)`。
 
 样式每页自动注入一次。要自己管样式（SSR、严格 CSP、自定义主题流水线）就
 改成引入 `css` 字符串。

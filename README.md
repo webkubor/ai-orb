@@ -59,10 +59,11 @@ npm i ai-orb
 ```js
 import { AgentOrb } from 'ai-orb'
 
-const orb = new AgentOrb(document.querySelector('#orb'))
+const orb = new AgentOrb(document.querySelector('#orb'), { theme: 'blue' })
 
 orb.state = 'thinking'   // model is composing
 orb.state = 'working'    // long job running — the ring spins
+orb.theme = 'violet'     // swap theme at runtime
 orb.set('done', 3)       // finished, with an unread badge
 orb.destroy()            // always clean up on unmount
 ```
@@ -75,7 +76,7 @@ import { AgentOrb } from 'ai-orb/vue'
 </script>
 
 <template>
-  <AgentOrb :state="state" :unseen="n" @click="openChat" />
+  <AgentOrb :state="state" :unseen="n" :theme="theme" @click="openChat" />
 </template>
 ```
 
@@ -97,7 +98,27 @@ backend, and one typo shouldn't blank the page.
 
 ## 🎨 Theming
 
-Everything is a CSS variable. Override them on the element (or any ancestor):
+Eight built-in themes, one option:
+
+```js
+const orb = new AgentOrb(el, { theme: 'blue' })   // set at creation
+orb.theme = 'violet'                                // change at runtime
+orb.theme = null                                    // back to CSS defaults
+```
+
+| Name | Preview | `--ao-mid` |
+| --- | --- | --- |
+| `orange` | 🟠 | `#ff8a50` |
+| `blue` | 🔵 | `#3aa8d8` |
+| `green` | 🟢 | `#4cb782` |
+| `violet` | 🟣 | `#8b5cf6` |
+| `rose` | 🔴 | `#ef5350` |
+| `gold` | 🟡 | `#f5b800` |
+| `cyan` | 🩵 | `#22d3ee` |
+| `graphite` | ⚫ | `#8a8a8a` |
+
+Themes are CSS variables under the hood. Override any variable on the element
+(or any ancestor) for fine-grained control:
 
 ```css
 .agent-orb {
@@ -132,13 +153,14 @@ Throws if `host` is missing (silent failure gets misdiagnosed as a CSS problem).
 | `size` | `number \| string` | — | Numbers are treated as px |
 | `follow` | `boolean` | `true` | Cursor tracking |
 | `blink` | `boolean` | `true` | Blinking |
+| `theme` | `string \| null` | `null` | Built-in theme name (see above) |
 | `labels` | `object` | English | Override `aria-label` text for i18n |
 | `onClick` | `function` | — | Click handler |
 
 **Instance:** `orb.state`, `orb.unseen` (both settable), `orb.set(state, unseen?)`,
 `orb.destroy()`, `orb.el` (the button — use it to set CSS variables).
 
-**Also exported:** `STATES`, `DEFAULT_LABELS`, `css`, `injectStyle(doc?)`.
+**Also exported:** `STATES`, `DEFAULT_LABELS`, `THEMES`, `css`, `injectStyle(doc?)`.
 
 Styles auto-inject once per page. Import `css` instead if you manage styles
 yourself (SSR, strict CSP, or a custom theme pipeline).

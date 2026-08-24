@@ -31,6 +31,8 @@ export const AgentOrb = defineComponent({
     follow: { type: Boolean, default: true },
     /** 眨眼 */
     blink: { type: Boolean, default: true },
+    /** 内置主题名，不传则用 CSS 默认值 */
+    theme: { type: String, default: undefined },
     /** 覆盖无障碍文案，做多语言时用 */
     labels: { type: Object, default: undefined },
   },
@@ -46,6 +48,7 @@ export const AgentOrb = defineComponent({
         size: props.size,
         follow: props.follow,
         blink: props.blink,
+        theme: props.theme,
         labels: props.labels,
         onClick: (e) => emit('click', e),
       })
@@ -56,6 +59,7 @@ export const AgentOrb = defineComponent({
     // 开关分支干净得多——而且现实里没人会中途关掉眨眼。
     watch(() => props.state, (v) => { if (orb) orb.state = v })
     watch(() => props.unseen, (v) => { if (orb) orb.unseen = v })
+    watch(() => props.theme, (v) => { if (orb) orb.theme = v })
 
     onBeforeUnmount(() => { orb?.destroy(); orb = null })
 
@@ -66,5 +70,5 @@ export const AgentOrb = defineComponent({
   },
 })
 
-export { STATES, DEFAULT_LABELS, css, injectStyle } from './index.js'
+export { STATES, DEFAULT_LABELS, THEMES, css, injectStyle } from './index.js'
 export default AgentOrb

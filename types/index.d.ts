@@ -1,7 +1,9 @@
 export type OrbState = 'idle' | 'thinking' | 'working' | 'asking' | 'done' | 'error'
+export type ThemeName = 'orange' | 'blue' | 'green' | 'violet' | 'rose' | 'gold' | 'cyan' | 'graphite'
 
 export declare const STATES: readonly OrbState[]
 export declare const DEFAULT_LABELS: Record<OrbState, string>
+export declare const THEMES: Record<ThemeName, Record<string, string>>
 
 export interface AgentOrbOptions {
   /** 初始状态，默认 'idle'。未知值会回落到 'idle' 而不是抛错 */
@@ -14,6 +16,8 @@ export interface AgentOrbOptions {
   follow?: boolean
   /** 是否眨眼，默认 true */
   blink?: boolean
+  /** 内置主题名，不传则用 CSS 默认值。设新值立即生效 */
+  theme?: ThemeName | null
   /** 覆盖无障碍文案，做多语言时用 */
   labels?: Partial<Record<OrbState, string>>
   /** 点击回调 */
@@ -34,6 +38,8 @@ export declare class AgentOrb {
 
   state: OrbState
   unseen: number
+  /** 当前主题名，设新值立即生效 */
+  theme: ThemeName | null
 
   /** 语义糖：orb.set('done', 3) */
   set(state: OrbState, unseen?: number): this

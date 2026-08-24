@@ -70,14 +70,15 @@ export const css = `
    三点是最没有歧义的「思考中」符号，不需要教用户认。 */
 .is-thinking .ao-body, .is-thinking .ao-halo { animation-duration: 1.5s; }
 .is-thinking .ao-eyes { transform: translateY(-1.5px); }
-.ao-dots circle { fill: var(--ao-hi); opacity: .25; animation: ao-blip 1.25s ease-in-out infinite; }
+.ao-dots circle { fill: var(--ao-working-glow, var(--ao-hi)); opacity: .25; animation: ao-blip 1.25s ease-in-out infinite; }
 .ao-dots circle:nth-child(2) { animation-delay: .16s; }
 .ao-dots circle:nth-child(3) { animation-delay: .32s; }
 
-/* 出图中：一条环绕着转。全库唯一持续旋转的元素，专门留给最长的那段等待。 */
-.is-working { --ao-glow: var(--ao-hi); }
+/* 出图中：一条环绕着转。全库唯一持续旋转的元素，专门留给最长的那段等待。
+   光晕色跟主题走：--ao-working-glow 由主题色派生，默认跟 --ao-hi。 */
+.is-working { --ao-glow: var(--ao-working-glow, var(--ao-hi)); }
 .ao-ring {
-  fill: none; stroke: var(--ao-hi); stroke-width: 2; stroke-linecap: round;
+  fill: none; stroke: var(--ao-working-glow, var(--ao-hi)); stroke-width: 2; stroke-linecap: round;
   stroke-dasharray: 30 140; transform-origin: 32px 32px;
   animation: ao-spin 1.5s linear infinite;
 }

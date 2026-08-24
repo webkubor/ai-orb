@@ -3,6 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#14110e">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><defs><radialGradient id='f' cx='38%25' cy='32%25' r='72%25'><stop offset='0%25' stop-color='%23ffc79a'/><stop offset='58%25' stop-color='%23ff8a50'/><stop offset='100%25' stop-color='%23e8632f'/></radialGradient></defs><circle cx='32' cy='32' r='26' fill='none' stroke='%23ff8a50' stroke-width='8' opacity='.16'/><circle cx='32' cy='32' r='22' fill='url(%23f)'/><ellipse cx='25' cy='23' rx='6' ry='4.2' fill='rgba(255,255,255,.5)'/><g fill='%232a1a10'><ellipse cx='25.5' cy='32' rx='3.1' ry='3.6'/><ellipse cx='38.5' cy='32' rx='3.1' ry='3.6'/></g></svg>" type="image/svg+xml">
 <title>ai-orb · AI 助手状态球</title>
 <!--
   零构建 demo：没有打包、没有 npm install，直接 import 源码就跑。
@@ -58,8 +60,8 @@
     padding: 7px 14px; border-radius: 999px; cursor: pointer; font: inherit; font-size: 13px;
     border: 1px solid rgba(255,255,255,.12); background: transparent; color: #a89e93;
   }
-  button.pick:hover { border-color: #ff8a50; color: #ffa270; }
-  button.pick.on { background: #ff8a50; border-color: #ff8a50; color: #1a120c; font-weight: 600; }
+  button.pick:hover { border-color: var(--ao-mid, #ff8a50); color: var(--ao-hi, #ffa270); }
+  button.pick.on { background: var(--ao-mid, #ff8a50); border-color: var(--ao-mid, #ff8a50); color: #1a120c; font-weight: 600; }
 
   pre {
     margin: 0; padding: 18px 20px; overflow-x: auto;
@@ -70,6 +72,8 @@
   .theme-row { display: flex; gap: 30px; flex-wrap: wrap; align-items: center; }
   .theme { display: grid; justify-items: center; gap: 10px; }
   .theme small { color: #7d746a; font-size: 11.5px; }
+  .dot-btn { display: inline-flex; align-items: center; gap: 6px; }
+  .dot-btn::before { content: ''; width: 10px; height: 10px; border-radius: 50%; background: var(--dot, #888); }
   footer { margin-top: 60px; color: #5f574f; font-size: 12.5px; text-align: center; }
   footer a { color: #a89e93; }
 </style>
@@ -96,6 +100,7 @@
         <p id="playDesc">待命。只呼吸，不做别的——它是常驻状态，多余动效会变成噪音。</p>
         <small id="playCode">orb.state = 'idle'</small>
         <div class="btns" id="picks"></div>
+        <div class="btns" id="themePicks" style="margin-top:10px"></div>
       </div>
     </div>
   </section>
@@ -113,7 +118,7 @@ orb.destroy()            // 卸载时记得清理</pre>
   </section>
 
   <section>
-    <h2>换主题：改 CSS 变量就行</h2>
+    <h2>换主题：改 CSS 变量或用 theme 选项</h2>
     <div class="theme-row" id="themes"></div>
   </section>
 
@@ -123,7 +128,7 @@ orb.destroy()            // 卸载时记得清理</pre>
 </div>
 
 <script type="module">
-import { AgentOrb } from '../src/index.js'
+import { AgentOrb, THEMES } from '../src/index.js'
 
 const STATES = [
   ['idle',     '待命',     '只呼吸。常驻状态，多余动效会变成噪音。'],
@@ -166,24 +171,37 @@ for (const [state, name, d] of STATES) {
   picks.append(btn)
 }
 
+// 主题选择器
+const THEME_NAMES = { orange: '暖橙', blue: '青蓝', green: '薄荷', violet: '紫罗兰', rose: '玫瑰', gold: '琥珀', cyan: '冰蓝', graphite: '石墨' }
+const themePicks = document.getElementById('themePicks')
+let curTheme = 'orange'
+for (const [key, vars] of Object.entries(THEMES)) {
+  const btn = document.createElement('button')
+  btn.className = 'pick dot-btn' + (key === 'orange' ? ' on' : '')
+  btn.textContent = THEME_NAMES[key] || key
+  btn.style.setProperty('--dot', vars['--ao-mid'])
+  btn.onclick = () => {
+    curTheme = key
+    play.theme = key
+    themePicks.querySelectorAll('.pick').forEach((x) => x.classList.toggle('on', x === btn))
+  }
+  themePicks.append(btn)
+}
+
 // 主题：全靠 CSS 变量，核心代码一行没改
-const THEMES = [
-  ['默认暖橙', {}],
-  ['青蓝', { '--ao-hi': '#a5e9ff', '--ao-mid': '#3aa8d8', '--ao-lo': '#1c6a94', '--ao-glow': '#3aa8d8', '--ao-ink': '#0d2733' }],
-  ['薄荷', { '--ao-hi': '#c8f5d8', '--ao-mid': '#4cb782', '--ao-lo': '#2b7a55', '--ao-glow': '#4cb782', '--ao-ink': '#0f2b1d' }],
-  ['紫罗兰', { '--ao-hi': '#dcc8ff', '--ao-mid': '#8b5cf6', '--ao-lo': '#5b32b8', '--ao-glow': '#8b5cf6', '--ao-ink': '#1e1233' }],
-  ['石墨', { '--ao-hi': '#e8e8e8', '--ao-mid': '#8a8a8a', '--ao-lo': '#4a4a4a', '--ao-glow': '#8a8a8a', '--ao-ink': '#1a1a1a' }],
+const THEMES_SHOW = [
+  ['暖橙', 'orange'], ['青蓝', 'blue'], ['薄荷', 'green'], ['紫罗兰', 'violet'],
+  ['玫瑰', 'rose'], ['琥珀', 'gold'], ['冰蓝', 'cyan'], ['石墨', 'graphite'],
 ]
 const themes = document.getElementById('themes')
-for (const [name, vars] of THEMES) {
+for (const [name, key] of THEMES_SHOW) {
   const box = document.createElement('div')
   box.className = 'theme'
   const slot = document.createElement('div')
   const cap = document.createElement('small'); cap.textContent = name
   box.append(slot, cap)
   themes.append(box)
-  const o = new AgentOrb(slot, { state: 'working' })
-  for (const [k, v] of Object.entries(vars)) o.el.style.setProperty(k, v)
+  new AgentOrb(slot, { state: 'working', theme: key })
 }
 </script>
 </body>
