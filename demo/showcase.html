@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ai-orb showcase</title>
+<style>
+  :root { color-scheme: light; }
+  * { box-sizing: border-box; margin: 0; }
+  body {
+    padding: 40px 32px 60px;
+    background: #faf8f5;
+    font: 15px/1.6 -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif;
+    color: #1a120c;
+    display: flex; flex-direction: column; align-items: center;
+  }
+  h1 { font-size: 28px; font-weight: 700; margin-bottom: 6px; letter-spacing: -.01em; }
+  .sub { color: #8a7e72; font-size: 14px; margin-bottom: 36px; }
+
+  .section-title {
+    font-size: 11px; font-weight: 700; letter-spacing: .14em;
+    text-transform: uppercase; color: #a09488; margin-bottom: 16px;
+    width: 100%; max-width: 720px;
+  }
+
+  /* 状态行 */
+  .states {
+    display: flex; gap: 24px; flex-wrap: wrap; justify-content: center;
+    margin-bottom: 40px;
+  }
+  .state {
+    display: grid; justify-items: center; gap: 10px;
+    padding: 24px 16px 16px;
+    background: #fff; border-radius: 16px;
+    box-shadow: 0 1px 4px rgba(0,0,0,.06), 0 0 0 1px rgba(0,0,0,.04);
+    min-width: 100px;
+  }
+  .state b { font-size: 13px; font-weight: 600; }
+  .state small { color: #a09488; font-size: 11px; }
+
+  /* 形态行 */
+  .shapes {
+    display: flex; gap: 32px; flex-wrap: wrap; justify-content: center;
+    margin-bottom: 40px;
+  }
+  .shape {
+    display: grid; justify-items: center; gap: 10px;
+    padding: 28px 20px 18px;
+    background: #fff; border-radius: 16px;
+    box-shadow: 0 1px 4px rgba(0,0,0,.06), 0 0 0 1px rgba(0,0,0,.04);
+  }
+  .shape b { font-size: 13px; font-weight: 600; }
+
+  /* 主题行 */
+  .themes {
+    display: flex; gap: 20px; flex-wrap: wrap; justify-content: center;
+    margin-bottom: 40px;
+  }
+  .theme {
+    display: grid; justify-items: center; gap: 8px;
+    padding: 20px 14px 14px;
+    background: #fff; border-radius: 14px;
+    box-shadow: 0 1px 4px rgba(0,0,0,.06), 0 0 0 1px rgba(0,0,0,.04);
+  }
+  .theme small { color: #a09488; font-size: 11px; }
+
+  /* 底部信息 */
+  .info {
+    margin-top: 20px; color: #a09488; font-size: 12px; text-align: center;
+  }
+  .info a { color: #8a7e72; }
+</style>
+</head>
+<body>
+  <h1>🔮 ai-orb</h1>
+  <p class="sub">一颗会表态的 AI 助手状态球 · 零依赖 · 4 KB · 六状态 · 八主题 · 三形态</p>
+
+  <div class="section-title">六个状态</div>
+  <div class="states" id="states"></div>
+
+  <div class="section-title">三种形态</div>
+  <div class="shapes" id="shapes"></div>
+
+  <div class="section-title">八色主题</div>
+  <div class="themes" id="themes"></div>
+
+  <div class="info">
+    <a href="https://github.com/webkubor/ai-orb">github.com/webkubor/ai-orb</a> ·
+    <a href="https://webkubor.github.io/ai-orb/">Live Demo</a> ·
+    MIT © webkubor
+  </div>
+
+<script type="module">
+import { AgentOrb, THEMES, SHAPES } from '../src/index.js'
+
+const STATES = [
+  ['idle',     '待命',     '缓慢呼吸'],
+  ['thinking', '在想',     '三点闪'],
+  ['working',  '干活中',   '环在转'],
+  ['asking',   '等你回话', '左右摆'],
+  ['done',     '好了',     '弹一下'],
+  ['error',    '出错了',   '褪成灰'],
+]
+
+// 六个状态
+const statesEl = document.getElementById('states')
+for (const [state, name, desc] of STATES) {
+  const box = document.createElement('div')
+  box.className = 'state'
+  const slot = document.createElement('div')
+  const b = document.createElement('b'); b.textContent = name
+  const s = document.createElement('small'); s.textContent = desc
+  box.append(slot, b, s)
+  statesEl.append(box)
+  new AgentOrb(slot, { state, unseen: state === 'done' ? 3 : 0 })
+}
+
+// 三种形态
+const SHAPE_NAMES = { circle: '圆球', squircle: '方块', pill: '胶囊' }
+const shapesEl = document.getElementById('shapes')
+for (const shape of SHAPES) {
+  const box = document.createElement('div')
+  box.className = 'shape'
+  const slot = document.createElement('div')
+  const b = document.createElement('b'); b.textContent = SHAPE_NAMES[shape]
+  box.append(slot, b)
+  shapesEl.append(box)
+  new AgentOrb(slot, { state: 'thinking', shape })
+}
+
+// 八色主题
+const THEME_NAMES = { orange: '暖橙', blue: '青蓝', green: '薄荷', violet: '紫罗兰', rose: '玫瑰', gold: '琥珀', cyan: '冰蓝', graphite: '石墨' }
+const themesEl = document.getElementById('themes')
+for (const [key, vars] of Object.entries(THEMES)) {
+  const box = document.createElement('div')
+  box.className = 'theme'
+  const slot = document.createElement('div')
+  const s = document.createElement('small'); s.textContent = THEME_NAMES[key]
+  box.append(slot, s)
+  themesEl.append(box)
+  new AgentOrb(slot, { state: 'working', theme: key })
+}
+</script>
+</body>
+</html>
