@@ -47,6 +47,19 @@ orb.theme = 'violet'                  // 运行时秒切
 |---|---|---|---|---|---|---|---|
 | 默认 | `#3aa8d8` | `#4cb782` | `#8b5cf6` | `#ef5350` | `#f5b800` | `#22d3ee` | `#8a8a8a` |
 
+## 三种形态
+
+```js
+new AgentOrb(el, { shape: 'squircle' })  // 圆角方块
+new AgentOrb(el, { shape: 'pill' })      // 胶囊
+```
+
+| `circle` | `squircle` | `pill` |
+|---|---|---|
+| 圆球（默认） | 圆角方块 | 胶囊 |
+
+形态只在创建时读取。想动态换？`destroy()` 再 `new` 一个。
+
 ## 30 秒上手
 
 ```bash
@@ -116,6 +129,7 @@ API 就这些。
 | `size` | `number \| string` | — | 数字按 px 处理 |
 | `follow` | `boolean` | `true` | 眼睛跟随光标 |
 | `blink` | `boolean` | `true` | 眨眼 |
+| `shape` | `string` | `'circle'` | 外形：`circle` / `squircle` / `pill` |
 | `theme` | `string \| null` | `null` | 内置主题名（见上表） |
 | `labels` | `object` | 英文 | 覆盖 `aria-label` 文案，做多语言用 |
 | `onClick` | `function` | — | 点击回调 |
@@ -123,7 +137,7 @@ API 就这些。
 **实例：** `orb.state`、`orb.unseen`、`orb.theme`（都可写）、`orb.set(state, unseen?)`、
 `orb.destroy()`、`orb.el`（那个 button，用它设 CSS 变量）。
 
-**另外导出：** `STATES`、`DEFAULT_LABELS`、`THEMES`、`css`、`injectStyle(doc?)`。
+**另外导出：** `STATES`、`DEFAULT_LABELS`、`SHAPES`、`THEMES`、`css`、`injectStyle(doc?)`。
 
 样式每页自动注入一次。要自己管样式（SSR、严格 CSP、自定义主题流水线）就
 改成引入 `css` 字符串。

@@ -1,7 +1,9 @@
 export type OrbState = 'idle' | 'thinking' | 'working' | 'asking' | 'done' | 'error'
 export type ThemeName = 'orange' | 'blue' | 'green' | 'violet' | 'rose' | 'gold' | 'cyan' | 'graphite'
+export type ShapeName = 'circle' | 'squircle' | 'pill'
 
 export declare const STATES: readonly OrbState[]
+export declare const SHAPES: readonly ShapeName[]
 export declare const DEFAULT_LABELS: Record<OrbState, string>
 export declare const THEMES: Record<ThemeName, Record<string, string>>
 
@@ -16,6 +18,8 @@ export interface AgentOrbOptions {
   follow?: boolean
   /** 是否眨眼，默认 true */
   blink?: boolean
+  /** 外形：circle（默认）/ squircle（圆角方块）/ pill（胶囊）。只在创建时读取 */
+  shape?: ShapeName
   /** 内置主题名，不传则用 CSS 默认值。设新值立即生效 */
   theme?: ThemeName | null
   /** 覆盖无障碍文案，做多语言时用 */
@@ -40,6 +44,8 @@ export declare class AgentOrb {
   unseen: number
   /** 当前主题名，设新值立即生效 */
   theme: ThemeName | null
+  /** 外形，只在创建时读取，运行时不支持动态改 */
+  readonly shape: ShapeName
 
   /** 语义糖：orb.set('done', 3) */
   set(state: OrbState, unseen?: number): this

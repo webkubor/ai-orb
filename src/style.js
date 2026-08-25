@@ -32,6 +32,8 @@ export const css = `
   cursor: pointer; -webkit-tap-highlight-color: transparent;
 }
 .agent-orb:focus-visible { outline: 2px solid var(--ao-glow); outline-offset: 3px; border-radius: 50%; }
+.ao-shape-squircle:focus-visible { border-radius: 12px; }
+.ao-shape-pill:focus-visible { border-radius: 999px; }
 .ao-svg { display: block; width: 100%; height: 100%; overflow: visible; }
 
 .ao-body { transform-origin: 32px 32px; animation: ao-breathe 4.2s ease-in-out infinite; }
@@ -62,6 +64,12 @@ export const css = `
 .ao-ring, .ao-dots { display: none; }
 .is-working .ao-ring { display: block; }
 .is-thinking .ao-dots { display: block; }
+
+/* ── 形态 ──────────────────────────────────────────────────────────────── */
+/* 胶囊形：主体拉宽，容器也跟着变 */
+.ao-shape-pill { width: calc(var(--ao-size) * 1.5); }
+/* 圆角方块：focus-outline 用方的 */
+.ao-shape-squircle:focus-visible { border-radius: 12px; }
 
 /* ── 各状态 ───────────────────────────────────────────────────────────────
    待命：只呼吸。它是常驻状态，任何多余动效都会变成视觉噪音。 */

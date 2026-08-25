@@ -19,6 +19,9 @@ import { injectStyle } from './style.js'
 /** 状态清单。传入未知值按 idle 处理，不抛错——状态多半来自后端，不该因此白屏。 */
 export const STATES = ['idle', 'thinking', 'working', 'asking', 'done', 'error']
 
+/** 形态清单。 */
+export const SHAPES = ['circle', 'squircle', 'pill']
+
 /** 默认的无障碍文案。状态必须有文字版，不能只靠看脸。 */
 export const DEFAULT_LABELS = {
   idle: 'Assistant · idle',
@@ -93,6 +96,7 @@ export class AgentOrb {
    * @param {number|string} [opts.size] 尺寸，数字按 px；不传则用 CSS 的 56px
    * @param {boolean} [opts.follow=true] 眼睛是否跟随鼠标
    * @param {boolean} [opts.blink=true]  是否眨眼
+   * @param {string} [opts.shape='circle'] 外形：circle / squircle / pill
    * @param {string} [opts.theme]       内置主题名（THEMES 的 key），不传则用 CSS 默认值
    * @param {object} [opts.labels]      覆盖无障碍文案（做多语言时用）
    * @param {(e: MouseEvent) => void} [opts.onClick]
@@ -112,6 +116,7 @@ export class AgentOrb {
     this._eye = { x: 0, y: 0 }
     this._blinkTimer = 0
     this._destroyed = false
+    this._shape = SHAPES.includes(opts.shape) ? opts.shape : 'circle'
 
     this._theme = opts.theme || null
 
@@ -151,6 +156,9 @@ export class AgentOrb {
     this._render()
   }
 
+  /** 外形。只在创建时读取，运行时不支持动态改——换形状需要 destroy 重建。 */
+  get shape() { return this._shape }
+
   /** 语义糖，链式写起来顺手：orb.set('working') */
   set(state, unseen) {
     this.state = state
@@ -173,41 +181,96 @@ export class AgentOrb {
     const doc = this._doc
     const btn = doc.createElement('button')
     btn.type = 'button'
-    btn.className = 'agent-orb'
+    btn.className = `agent-orb ao-shape-${this._shape}`
     if (opts.size) btn.style.setProperty('--ao-size', typeof opts.size === 'number' ? `${opts.size}px` : opts.size)
     if (opts.onClick) btn.addEventListener('click', opts.onClick)
 
-    // innerHTML 里没有任何外部输入，全是写死的结构；用户内容只出现在 badge 的
-    // textContent 和 aria-label 上（见 _render），那两处都不是 HTML 解析。
+    const id = this._id
+    const sh = this._shape
+    const isP = sh === 'pill'
+    const isS = sh === 'squircle'
+
+    // body 轮廓
+    let body
+    if (isP) {
+      // 胶囊：宽 52 高 36，rx=18（完全圆头），居中 (6, 14)
+      body = `<rect class="ao-body" x="6" y="14" width="52" height="36" rx="18" fill="url(#${id})"/>`
+    } else if (isS) {
+      // 圆角方块：44x44，rx=12，居中 (10, 10)
+      body = `<rect class="ao-body" x="10" y="10" width="44" height="44" rx="12" fill="url(#${id})"/>`
+    } else {
+      body = `<circle class="ao-body" cx="32" cy="32" r="22" fill="url(#${id})"/>`
+    }
+
+    // 高光
+    let gloss
+    if (isP) {
+      gloss = '<ellipse class="ao-gloss" cx="22" cy="24" rx="10" ry="6"/>'
+    } else if (isS) {
+      gloss = '<ellipse class="ao-gloss" cx="24" cy="22" rx="10" ry="7"/>'
+    } else {
+      gloss = '<ellipse class="ao-gloss" cx="25" cy="23" rx="6" ry="4.2"/>'
+    }
+
+    // 光环
+    let halo
+    if (isP) {
+      halo = '<rect class="ao-halo" x="2" y="10" width="60" height="44" rx="22"/>'
+    } else if (isS) {
+      halo = '<rect class="ao-halo" x="6" y="6" width="52" height="52" rx="14"/>'
+    } else {
+      halo = '<circle class="ao-halo" cx="32" cy="32" r="26"/>'
+    }
+
+    // 旋转环
+    let ring
+    if (isP) {
+      ring = '<ellipse class="ao-ring" cx="32" cy="32" rx="28" ry="20"/>'
+    } else if (isS) {
+      ring = '<rect class="ao-ring" x="6" y="6" width="52" height="52" rx="14"/>'
+    } else {
+      ring = '<circle class="ao-ring" cx="32" cy="32" r="27"/>'
+    }
+
+    // ring 高光
+    let ringGloss = isP ? '' : '<ellipse class="ao-gloss" cx="25" cy="18.5" rx="10" ry="3.5"/>'
+
+    // thinking dots Y 坐标（头顶位置随 shape 调整）
+    const dotsY = isP ? 7 : isS ? 5 : 9
+
+    // 眼睛 Y 坐标（方块和胶囊的眼睛居中偏上一点更自然）
+    const eyeY = isP ? 32 : isS ? 32 : 32
+
     btn.innerHTML = `
 <svg class="ao-svg" viewBox="0 0 64 64" aria-hidden="true">
   <defs>
-    <radialGradient id="${this._id}" cx="38%" cy="32%" r="72%">
+    <radialGradient id="${id}" cx="38%" cy="32%" r="72%">
       <stop offset="0%" stop-color="var(--ao-hi)"/>
       <stop offset="58%" stop-color="var(--ao-mid)"/>
       <stop offset="100%" stop-color="var(--ao-lo)"/>
     </radialGradient>
   </defs>
-  <circle class="ao-halo" cx="32" cy="32" r="26"/>
-  <circle class="ao-body" cx="32" cy="32" r="22" fill="url(#${this._id})"/>
-  <ellipse class="ao-gloss" cx="25" cy="23" rx="6" ry="4.2"/>
-  <circle class="ao-ring" cx="32" cy="32" r="27"/>
+  ${halo}
+  ${body}
+  ${gloss}
+  ${ring}
+  ${ringGloss}
   <g class="ao-dots">
-    <circle cx="24" cy="9" r="2"/><circle cx="32" cy="7" r="2"/><circle cx="40" cy="9" r="2"/>
+    <circle cx="24" cy="${dotsY}" r="2"/><circle cx="32" cy="${dotsY - 2}" r="2"/><circle cx="40" cy="${dotsY}" r="2"/>
   </g>
   <g class="ao-eyes">
     <g class="ao-eye ao-eye-round">
-      <ellipse class="ao-pupil" cx="25.5" cy="32" rx="3.1" ry="3.6"/>
-      <ellipse class="ao-pupil" cx="38.5" cy="32" rx="3.1" ry="3.6"/>
+      <ellipse class="ao-pupil" cx="25.5" cy="${eyeY}" rx="3.1" ry="3.6"/>
+      <ellipse class="ao-pupil" cx="38.5" cy="${eyeY}" rx="3.1" ry="3.6"/>
     </g>
     <g class="ao-eye ao-eye-focus">
-      <path class="ao-line" d="M21 32h7"/><path class="ao-line" d="M36 32h7"/>
+      <path class="ao-line" d="M21 ${eyeY}h7"/><path class="ao-line" d="M36 ${eyeY}h7"/>
     </g>
     <g class="ao-eye ao-eye-smile">
-      <path class="ao-line" d="M20 33q4.5 -5 9 0"/><path class="ao-line" d="M35 33q4.5 -5 9 0"/>
+      <path class="ao-line" d="M20 ${eyeY + 1}q4.5 -5 9 0"/><path class="ao-line" d="M35 ${eyeY + 1}q4.5 -5 9 0"/>
     </g>
     <g class="ao-eye ao-eye-cross">
-      <path class="ao-line" d="M21 29l7 6M28 29l-7 6"/><path class="ao-line" d="M36 29l7 6M43 29l-7 6"/>
+      <path class="ao-line" d="M21 ${eyeY - 3}l7 6M28 ${eyeY - 3}l-7 6"/><path class="ao-line" d="M36 ${eyeY - 3}l7 6M43 ${eyeY - 3}l-7 6"/>
     </g>
   </g>
 </svg>

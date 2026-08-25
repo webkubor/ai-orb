@@ -16,7 +16,7 @@
  *   </template>
  */
 import { defineComponent, h, onBeforeUnmount, onMounted, ref, watch } from 'vue'
-import { AgentOrb as Core, STATES } from './index.js'
+import { AgentOrb as Core, STATES, SHAPES } from './index.js'
 
 export const AgentOrb = defineComponent({
   name: 'AgentOrb',
@@ -31,6 +31,8 @@ export const AgentOrb = defineComponent({
     follow: { type: Boolean, default: true },
     /** 眨眼 */
     blink: { type: Boolean, default: true },
+    /** 外形：circle / squircle / pill，只在挂载时读取 */
+    shape: { type: String, default: undefined, validator: (v) => !v || SHAPES.includes(v) },
     /** 内置主题名，不传则用 CSS 默认值 */
     theme: { type: String, default: undefined },
     /** 覆盖无障碍文案，做多语言时用 */
@@ -48,6 +50,7 @@ export const AgentOrb = defineComponent({
         size: props.size,
         follow: props.follow,
         blink: props.blink,
+        shape: props.shape,
         theme: props.theme,
         labels: props.labels,
         onClick: (e) => emit('click', e),
@@ -70,5 +73,5 @@ export const AgentOrb = defineComponent({
   },
 })
 
-export { STATES, DEFAULT_LABELS, THEMES, css, injectStyle } from './index.js'
+export { STATES, DEFAULT_LABELS, SHAPES, THEMES, css, injectStyle } from './index.js'
 export default AgentOrb

@@ -101,6 +101,7 @@
         <small id="playCode">orb.state = 'idle'</small>
         <div class="btns" id="picks"></div>
         <div class="btns" id="themePicks" style="margin-top:10px"></div>
+        <div class="btns" id="shapePicks" style="margin-top:10px"></div>
       </div>
     </div>
   </section>
@@ -122,13 +123,18 @@ orb.destroy()            // 卸载时记得清理</pre>
     <div class="theme-row" id="themes"></div>
   </section>
 
+  <section>
+    <h2>换形态：shape 选项</h2>
+    <div class="theme-row" id="shapes"></div>
+  </section>
+
   <footer>
     MIT · <a href="https://github.com/webkubor/ai-orb">github.com/webkubor/ai-orb</a>
   </footer>
 </div>
 
 <script type="module">
-import { AgentOrb, THEMES } from '../src/index.js'
+import { AgentOrb, THEMES, SHAPES } from '../src/index.js'
 
 const STATES = [
   ['idle',     '待命',     '只呼吸。常驻状态，多余动效会变成噪音。'],
@@ -154,15 +160,17 @@ for (const [state, name, desc] of STATES) {
 }
 
 // 试试看
-const play = new AgentOrb(document.getElementById('playground'), { size: 76 })
+let play = new AgentOrb(document.getElementById('playground'), { size: 76 })
 const picks = document.getElementById('picks')
 const desc = document.getElementById('playDesc')
 const code = document.getElementById('playCode')
+let curState = 'idle'
 for (const [state, name, d] of STATES) {
   const btn = document.createElement('button')
   btn.className = 'pick' + (state === 'idle' ? ' on' : '')
   btn.textContent = name
   btn.onclick = () => {
+    curState = state
     play.set(state, state === 'done' ? 5 : 0)
     desc.textContent = d
     code.textContent = state === 'done' ? "orb.set('done', 5)" : `orb.state = '${state}'`
@@ -188,6 +196,26 @@ for (const [key, vars] of Object.entries(THEMES)) {
   themePicks.append(btn)
 }
 
+// 形态选择器
+const SHAPE_NAMES = { circle: '圆球', squircle: '方块', pill: '胶囊' }
+const shapePicks = document.getElementById('shapePicks')
+let curShape = 'circle'
+for (const shape of SHAPES) {
+  const btn = document.createElement('button')
+  btn.className = 'pick' + (shape === 'circle' ? ' on' : '')
+  btn.textContent = SHAPE_NAMES[shape] || shape
+  btn.onclick = () => {
+    curShape = shape
+    // 形态不能动态改，需要 destroy 重建
+    play.destroy()
+    const pg = document.getElementById('playground')
+    play = new AgentOrb(pg, { size: 76, shape, theme: curTheme })
+    if (curState !== 'idle') play.set(curState, curState === 'done' ? 5 : 0)
+    shapePicks.querySelectorAll('.pick').forEach((x) => x.classList.toggle('on', x === btn))
+  }
+  shapePicks.append(btn)
+}
+
 // 主题：全靠 CSS 变量，核心代码一行没改
 const THEMES_SHOW = [
   ['暖橙', 'orange'], ['青蓝', 'blue'], ['薄荷', 'green'], ['紫罗兰', 'violet'],
@@ -202,6 +230,19 @@ for (const [name, key] of THEMES_SHOW) {
   box.append(slot, cap)
   themes.append(box)
   new AgentOrb(slot, { state: 'working', theme: key })
+}
+
+// 形态展示：三种形态 × 六个状态
+const SHAPE_SHOW = { circle: '圆球', squircle: '方块', pill: '胶囊' }
+const shapes = document.getElementById('shapes')
+for (const shape of SHAPES) {
+  const box = document.createElement('div')
+  box.className = 'theme'
+  const slot = document.createElement('div')
+  const cap = document.createElement('small'); cap.textContent = SHAPE_SHOW[shape]
+  box.append(slot, cap)
+  shapes.append(box)
+  new AgentOrb(slot, { state: 'thinking', shape })
 }
 </script>
 </body>
