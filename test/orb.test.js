@@ -160,3 +160,65 @@ test('四组眼形全都渲染在 DOM 里，靠 CSS 显隐', () => {
   }
   o.destroy()
 })
+
+test('状态与未读更新保留外部自定义主题变量', () => {
+  const o = mount({ theme: 'blue', follow: false, blink: false })
+  o.el.style.setProperty('--ao-mid', '#abcdef')
+  o.state = 'error'
+  assert.equal(o.el.style.getPropertyValue('--ao-mid'), '#abcdef')
+  o.state = 'done'
+  o.unseen = 3
+  assert.equal(o.el.style.getPropertyValue('--ao-mid'), '#abcdef')
+  o.destroy()
+})
+
+test('思考状态不会被鼠标跟随覆盖', () => {
+  const o = mount({ blink: false })
+  o.el.getBoundingClientRect = () => ({ left: 10, top: 10, width: 56, height: 56 })
+  o._frame()
+  assert.ok(o._eyesEl.style.transform)
+  o.state = 'thinking'
+  o._frame()
+  assert.equal(o._eyesEl.style.transform, '')
+  o.state = 'idle'
+  o._frame()
+  assert.ok(o._eyesEl.style.transform)
+  o.destroy()
+})
+
+test('不同 document 各自注入样式', () => {
+  const other = new JSDOM('<!doctype html><body><main></main>')
+  const o = new AgentOrb(other.window.document.querySelector('main'), { follow: false, blink: false })
+  assert.equal(other.window.document.querySelectorAll('style[data-agent-orb]').length, 1)
+  o.destroy()
+  other.window.close()
+})
+
+test('动态切换减弱动态效果会停止跟随和眨眼，卸载后清理监听', () => {
+  const original = window.matchMedia
+  let change
+  let removed = false
+  const query = { matches: true, addEventListener: (_, fn) => { change = fn },
+    removeEventListener: (_, fn) => { removed = fn === change } }
+  window.matchMedia = () => query
+  const o = mount()
+  try {
+    assert.equal(o._blinkTimer, 0)
+    o.el.getBoundingClientRect = () => ({ left: 10, top: 10, width: 56, height: 56 })
+    o._frame()
+    assert.equal(o._eyesEl.style.transform, '')
+    query.matches = false
+    change()
+    assert.ok(o._blinkTimer)
+    o._frame()
+    assert.ok(o._eyesEl.style.transform)
+    query.matches = true
+    change()
+    assert.equal(o._eyesEl.style.transform, '')
+    assert.equal(o.el.classList.contains('ao-blink'), false)
+  } finally {
+    o.destroy()
+    window.matchMedia = original
+  }
+  assert.equal(removed, true)
+})

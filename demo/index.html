@@ -77,6 +77,7 @@
   footer { margin-top: 60px; color: #5f574f; font-size: 12.5px; text-align: center; }
   footer a { color: #a89e93; }
 </style>
+<link rel="stylesheet" href="./interaction.css">
 </head>
 <body>
 <div class="wrap">
@@ -88,22 +89,22 @@
   </p>
 
   <section>
-    <h2>六个状态</h2>
-    <div class="grid" id="grid"></div>
+    <h2>试试看</h2>
+    <div class="stage">
+      <div class="preview"><div id="playground"></div><strong id="statusName">待命</strong><span id="statusHint">点击状态球，开始演示</span><button class="pick" id="runDemo" type="button">演示处理流程</button></div>
+      <div class="stage-copy">
+        <p id="playDesc" role="status" aria-live="polite">待命。只呼吸，不做别的——它是常驻状态，多余动效会变成噪音。</p>
+        <small id="playCode">orb.state = 'idle'</small>
+        <fieldset><legend>当前状态</legend><div class="btns" id="picks"></div></fieldset>
+        <fieldset><legend>主题颜色</legend><div class="btns" id="themePicks"></div></fieldset>
+        <fieldset><legend>外形</legend><div class="btns" id="shapePicks"></div></fieldset>
+      </div>
+    </div>
   </section>
 
   <section>
-    <h2>试试看</h2>
-    <div class="stage">
-      <div id="playground"></div>
-      <div class="stage-copy">
-        <p id="playDesc">待命。只呼吸，不做别的——它是常驻状态，多余动效会变成噪音。</p>
-        <small id="playCode">orb.state = 'idle'</small>
-        <div class="btns" id="picks"></div>
-        <div class="btns" id="themePicks" style="margin-top:10px"></div>
-        <div class="btns" id="shapePicks" style="margin-top:10px"></div>
-      </div>
-    </div>
+    <h2>六个状态</h2>
+    <div class="grid" id="grid"></div>
   </section>
 
   <section>
@@ -156,11 +157,13 @@ for (const [state, name, desc] of STATES) {
   const s = document.createElement('small'); s.textContent = desc
   cell.append(b, s)
   grid.append(cell)
-  new AgentOrb(slot, { state, unseen: state === 'done' ? 3 : 0 })
+  new AgentOrb(slot, { state, unseen: state === 'done' ? 3 : 0,
+    labels: { [state]: `预览${name}` }, onClick: () => { stopDemo(); selectState(state) } })
 }
 
 // 试试看
-let play = new AgentOrb(document.getElementById('playground'), { size: 76 })
+const labels = Object.fromEntries(STATES.map(([state, name]) => [state, `客服助手 · ${name}`]))
+let play = new AgentOrb(document.getElementById('playground'), { size: 112, labels, onClick: toggleDemo })
 const picks = document.getElementById('picks')
 const desc = document.getElementById('playDesc')
 const code = document.getElementById('playCode')
@@ -169,13 +172,9 @@ for (const [state, name, d] of STATES) {
   const btn = document.createElement('button')
   btn.className = 'pick' + (state === 'idle' ? ' on' : '')
   btn.textContent = name
-  btn.onclick = () => {
-    curState = state
-    play.set(state, state === 'done' ? 5 : 0)
-    desc.textContent = d
-    code.textContent = state === 'done' ? "orb.set('done', 5)" : `orb.state = '${state}'`
-    picks.querySelectorAll('.pick').forEach((x) => x.classList.toggle('on', x === btn))
-  }
+  btn.dataset.state = state
+  btn.setAttribute('aria-pressed', String(state === 'idle'))
+  btn.onclick = () => { stopDemo(); selectState(state) }
   picks.append(btn)
 }
 
@@ -186,12 +185,13 @@ let curTheme = 'orange'
 for (const [key, vars] of Object.entries(THEMES)) {
   const btn = document.createElement('button')
   btn.className = 'pick dot-btn' + (key === 'orange' ? ' on' : '')
+  btn.setAttribute('aria-pressed', String(key === 'orange'))
   btn.textContent = THEME_NAMES[key] || key
   btn.style.setProperty('--dot', vars['--ao-mid'])
   btn.onclick = () => {
     curTheme = key
     play.theme = key
-    themePicks.querySelectorAll('.pick').forEach((x) => x.classList.toggle('on', x === btn))
+    themePicks.querySelectorAll('.pick').forEach((x) => markSelected(x, x === btn))
   }
   themePicks.append(btn)
 }
@@ -203,18 +203,56 @@ let curShape = 'circle'
 for (const shape of SHAPES) {
   const btn = document.createElement('button')
   btn.className = 'pick' + (shape === 'circle' ? ' on' : '')
+  btn.setAttribute('aria-pressed', String(shape === 'circle'))
   btn.textContent = SHAPE_NAMES[shape] || shape
   btn.onclick = () => {
     curShape = shape
     // 形态不能动态改，需要 destroy 重建
     play.destroy()
     const pg = document.getElementById('playground')
-    play = new AgentOrb(pg, { size: 76, shape, theme: curTheme })
+    play = new AgentOrb(pg, { size: 112, shape, theme: curTheme, labels, onClick: toggleDemo })
     if (curState !== 'idle') play.set(curState, curState === 'done' ? 5 : 0)
-    shapePicks.querySelectorAll('.pick').forEach((x) => x.classList.toggle('on', x === btn))
+    shapePicks.querySelectorAll('.pick').forEach((x) => markSelected(x, x === btn))
   }
   shapePicks.append(btn)
 }
+
+const runButton = document.getElementById('runDemo')
+let demoTimers = []
+let demoRunning = false
+runButton.onclick = toggleDemo
+function markSelected(button, selected) {
+  button.classList.toggle('on', selected)
+  button.setAttribute('aria-pressed', String(selected))
+}
+function selectState(state) {
+  curState = state
+  const [, name, description] = STATES.find(([key]) => key === state)
+  play.set(state, state === 'done' ? 5 : 0)
+  desc.textContent = description
+  code.textContent = state === 'done' ? "orb.set('done', 5)" : "orb.state = '" + state + "'"
+  document.getElementById('statusName').textContent = name
+  const hints = { idle: '随时可以开始', thinking: '正在理解你的问题', working: '正在处理，请稍候', asking: '需要你补充信息', done: '结果已就绪 · 5 条未读', error: '暂时未能完成，可以重试' }
+  document.getElementById('statusHint').textContent = hints[state]
+  picks.querySelectorAll('.pick').forEach(button => markSelected(button, button.dataset.state === state))
+}
+function stopDemo() {
+  demoTimers.forEach(clearTimeout)
+  demoTimers = []
+  demoRunning = false
+  runButton.textContent = '演示处理流程'
+}
+function toggleDemo() {
+  if (demoRunning) { stopDemo(); return }
+  demoRunning = true
+  runButton.textContent = '停止演示'
+  selectState('thinking')
+  demoTimers = [
+    setTimeout(() => selectState('working'), 1600),
+    setTimeout(() => { selectState('done'); stopDemo() }, 3800),
+  ]
+}
+window.addEventListener('pagehide', stopDemo)
 
 // 主题：全靠 CSS 变量，核心代码一行没改
 const THEMES_SHOW = [

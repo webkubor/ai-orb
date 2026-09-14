@@ -115,6 +115,9 @@ export class AgentOrb {
     this._wantBlink = opts.blink !== false
     this._eye = { x: 0, y: 0 }
     this._blinkTimer = 0
+    this._blinkEndTimer = 0
+    this._motionQuery = doc.defaultView?.matchMedia?.('(prefers-reduced-motion: reduce)')
+    this._onMotionChange = () => this._syncMotion()
     this._destroyed = false
     this._shape = SHAPES.includes(opts.shape) ? opts.shape : 'circle'
 
@@ -125,8 +128,8 @@ export class AgentOrb {
     this._applyTheme()
     this._render()
 
-    if (this._follow) join(this)
-    if (this._wantBlink) this._scheduleBlink()
+    this._motionQuery?.addEventListener('change', this._onMotionChange)
+    this._syncMotion()
   }
 
   /* ── 公开状态 ───────────────────────────────────────────────────────── */
@@ -172,10 +175,24 @@ export class AgentOrb {
     this._destroyed = true
     leave(this)
     clearTimeout(this._blinkTimer)
+    clearTimeout(this._blinkEndTimer)
+    this._motionQuery?.removeEventListener('change', this._onMotionChange)
     this.el?.remove()
   }
 
   /* ── 内部 ───────────────────────────────────────────────────────────── */
+
+  _syncMotion() {
+    leave(this)
+    clearTimeout(this._blinkTimer)
+    clearTimeout(this._blinkEndTimer)
+    this.el.classList.remove('ao-blink')
+    this._eye = { x: 0, y: 0 }
+    this._eyesEl.style.removeProperty('transform')
+    if (this._motionQuery?.matches || this._destroyed) return
+    if (this._follow) join(this)
+    if (this._wantBlink) this._scheduleBlink()
+  }
 
   _build(host, opts) {
     const doc = this._doc
@@ -291,6 +308,7 @@ export class AgentOrb {
     el.classList.toggle('ao-has-badge', showBadge)
     if (showBadge) this._badgeEl.textContent = this._unseen > 99 ? '99+' : String(this._unseen)
 
+    this._eyesEl.style.removeProperty('transform')
     const label = this._labels[this._state] || this._labels.idle
     el.setAttribute('aria-label', label)
     el.title = label
@@ -307,7 +325,7 @@ export class AgentOrb {
   /** 每帧把眼睛朝鼠标收一点。最大偏移 1.6px（球半径 22）——
    *  小到不会被当成动画，但人一眼就觉得「它看着我」。 */
   _frame() {
-    if (this._destroyed || !this._eyesEl) return
+    if (this._destroyed || !this._eyesEl || this._state === 'thinking' || this._motionQuery?.matches) return
     const b = this.el.getBoundingClientRect()
     if (!b.width) return                       // 隐藏时不算，省掉无谓的 layout
     const dx = pointer.x - (b.left + b.width / 2)
@@ -318,8 +336,8 @@ export class AgentOrb {
     const ty = (dy / d) * k
 
     // 指数平滑：每帧走剩余距离的 12%，眼神是「转过去」不是「跳过去」
-    this._eye.x += (tx - this._eye.x) * 0.12
-    this._eye.y += (ty - this._eye.y) * 0.12
+    this._eye = { x: this._eye.x + (tx - this._eye.x) * 0.12,
+      y: this._eye.y + (ty - this._eye.y) * 0.12 }
     this._eyesEl.style.transform = `translate(${this._eye.x.toFixed(2)}px, ${this._eye.y.toFixed(2)}px)`
   }
 
@@ -329,7 +347,7 @@ export class AgentOrb {
       if (this._destroyed) return
       if (this._state !== 'error') {
         this.el.classList.add('ao-blink')
-        setTimeout(() => this.el?.classList.remove('ao-blink'), 130)
+        this._blinkEndTimer = setTimeout(() => this.el?.classList.remove('ao-blink'), 130)
       }
       this._scheduleBlink()
     }, 2600 + Math.random() * 3800)

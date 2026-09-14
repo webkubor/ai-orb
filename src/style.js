@@ -25,15 +25,19 @@ export const css = `
   --ao-badge-bg: #e8632f;
   --ao-badge-fg: #fff;
   --ao-badge-ring: transparent;
+  --ao-feedback-duration: 160ms;
+  --ao-focus-radius: 50%;
 
   position: relative; display: inline-block;
   width: var(--ao-size); height: var(--ao-size);
   padding: 0; border: 0; background: transparent;
   cursor: pointer; -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation; vertical-align: middle;
+  transition: scale var(--ao-feedback-duration) ease-out;
 }
-.agent-orb:focus-visible { outline: 2px solid var(--ao-glow); outline-offset: 3px; border-radius: 50%; }
-.ao-shape-squircle:focus-visible { border-radius: 12px; }
-.ao-shape-pill:focus-visible { border-radius: 999px; }
+.agent-orb:focus-visible { outline: 2px solid var(--ao-glow); outline-offset: 3px; border-radius: var(--ao-focus-radius); }
+.ao-shape-squircle { --ao-focus-radius: 12px; }
+.ao-shape-pill { --ao-focus-radius: 999px; }
 .ao-svg { display: block; width: 100%; height: 100%; overflow: visible; }
 
 .ao-body { transform-origin: 32px 32px; animation: ao-breathe 4.2s ease-in-out infinite; }
@@ -98,7 +102,7 @@ export const css = `
 .is-done .ao-body { animation: ao-pop .5s cubic-bezier(.34,1.56,.64,1) 1, ao-breathe 4.2s ease-in-out infinite .5s; }
 
 /* 出错：褪成灰，不闪不抖。用「暗下来」表达故障，闪红只会让人紧张。 */
-.is-error { --ao-hi: #9a8b7e; --ao-mid: #6b5d52; --ao-lo: #463b33; --ao-glow: #6b5d52; }
+.is-error .ao-svg { --ao-hi: #9a8b7e; --ao-mid: #6b5d52; --ao-lo: #463b33; --ao-glow: #6b5d52; }
 
 .ao-badge {
   position: absolute; top: -1px; right: -1px;
@@ -110,8 +114,12 @@ export const css = `
 }
 .agent-orb.ao-has-badge .ao-badge { display: grid; }
 
-.agent-orb:hover .ao-body { filter: brightness(1.08); }
-.agent-orb:active .ao-svg { transform: scale(.94); }
+.ao-body { transition: filter var(--ao-feedback-duration) ease-out; }
+@media (hover: hover) {
+  .agent-orb:hover { scale: 1.06; }
+  .agent-orb:hover .ao-body { filter: brightness(1.08); }
+}
+.agent-orb:active { scale: .94; }
 
 @keyframes ao-breathe { 0%,100% { transform: scale(1); } 50% { transform: scale(1.045); } }
 @keyframes ao-spin { to { transform: rotate(360deg); } }
@@ -123,19 +131,17 @@ export const css = `
    系统开了「减弱动态效果」就全停，只留状态配色和眼形——信息一点不丢。 */
 @media (prefers-reduced-motion: reduce) {
   .ao-body, .ao-halo, .ao-ring, .ao-dots circle, .is-asking .ao-svg { animation: none !important; }
-  .ao-eyes, .ao-pupil { transition: none !important; }
+  .agent-orb, .ao-body, .ao-eyes, .ao-pupil { transition: none !important; }
+  .agent-orb:hover, .agent-orb:active { scale: 1; }
 }
 `
-
-let injected = false
 
 /** 把样式注入 document.head，重复调用只注一次。无 DOM 环境（SSR）直接跳过。 */
 export function injectStyle(doc) {
   const d = doc || (typeof document !== 'undefined' ? document : null)
-  if (!d || injected || d.querySelector('style[data-agent-orb]')) return
+  if (!d || d.querySelector('style[data-agent-orb]')) return
   const el = d.createElement('style')
   el.setAttribute('data-agent-orb', '')
   el.textContent = css
   d.head.appendChild(el)
-  injected = true
 }
