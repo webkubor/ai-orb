@@ -79,7 +79,8 @@ export class AgentWidget {
     const l = this._labels
     this.ui.heading.querySelector('h2').textContent = l.title
     for (const key of ['close', 'send', 'stop', 'retry', 'dismiss']) {
-      if (['send', 'stop', 'retry'].includes(key)) this.ui[key].textContent = l[key]
+      if (key === 'retry') this.ui[key].textContent = l[key]
+      if (['send', 'stop'].includes(key)) this.ui[key].querySelector('.aw-button-label').textContent = l[key]
       this.ui[key].title = l[key]
       this.ui[key].setAttribute('aria-label', l[key])
     }
@@ -104,7 +105,10 @@ export class AgentWidget {
     for (const text of suggestions.filter(value => typeof value === 'string' && value.trim())) {
       const button = this._doc.createElement('button')
       button.type = 'button'
-      button.textContent = text
+      const label = this._doc.createElement('span')
+      label.textContent = text
+      button.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14m-5-5 5 5-5 5"/></svg>'
+      button.prepend(label)
       button.addEventListener('click', () => this.send(text))
       this.ui.suggestions.appendChild(button)
     }
@@ -245,6 +249,7 @@ export class AgentWidget {
     const { ui, _labels: l } = this
     ui.root.dataset.open = String(this._isOpen)
     ui.root.dataset.state = this._state
+    ui.root.dataset.empty = String(this._messages.length === 0)
     ui.panel.setAttribute('aria-hidden', String(!this._isOpen))
     ui.status.textContent = this._stateMessage || l.states[this._state]
     ui.notice.textContent = this._stateMessage || (this._unread ? l.unread(this._unread) : l.states[this._state])

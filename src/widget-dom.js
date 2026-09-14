@@ -16,7 +16,7 @@ const markup = `
     <form class="aw-form">
       <label class="aw-label" for="aw-input"></label>
       <textarea class="aw-input" id="aw-input" rows="1" maxlength="2000" aria-describedby="aw-input-hint"></textarea>
-      <div class="aw-composer-actions"><span class="aw-hint" id="aw-input-hint"></span><button class="aw-send" type="submit"></button><button class="aw-stop" type="button" hidden></button></div>
+      <div class="aw-composer-actions"><span class="aw-hint" id="aw-input-hint"></span><button class="aw-send" type="submit"><span class="aw-button-label"></span><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5m-6 6 6-6 6 6"/></svg></button><button class="aw-stop" type="button" hidden><span class="aw-button-label"></span><svg viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="2"/></svg></button></div>
     </form>
     <p class="aw-footer" hidden></p>
   </section>

@@ -21,9 +21,9 @@ async function simulate(text, { signal, setState }) {
   await pause(700, signal)
   setState('working')
   await pause(1100, signal)
-  if (text === copy.suggestions[2] && attempt === 1) throw new Error('Simulated failure')
+  if (text === copy.failQuestion && attempt === 1) throw new Error('Simulated failure')
   if (text === copy.suggestions[1]) return { text: copy.asking, state: 'asking' }
-  return text === copy.suggestions[2] ? copy.recovered : copy.reply
+  return text === copy.failQuestion ? copy.recovered : copy.reply
 }
 
 function pause(ms, signal) {
@@ -87,5 +87,12 @@ document.querySelector('#language-toggle').addEventListener('click', () => setLo
 document.querySelector('#theme-toggle').addEventListener('click', toggleTheme)
 document.querySelectorAll('[data-state]').forEach(button => button.addEventListener('click', () => showState(button.dataset.state)))
 document.querySelectorAll('[data-open-assistant]').forEach(button => button.addEventListener('click', () => widget.open()))
+document.querySelector('#simulate-failure').addEventListener('click', () => {
+  const text = scenarios[locale].failQuestion
+  attempts.delete(text)
+  widget.cancel()
+  widget.open()
+  widget.send(text)
+})
 document.querySelector('#reset-preview').addEventListener('click', () => showState('idle'))
 window.addEventListener('pagehide', event => { if (!event.persisted) widget.destroy() })
