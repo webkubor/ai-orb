@@ -1,6 +1,6 @@
 {
   "name": "ai-orb",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "A tiny SVG orb that shows what your AI assistant is doing — thinking, working, waiting on you, done. Zero dependencies.",
   "keywords": [
     "ai",
