@@ -49,3 +49,5 @@ button.pick:active { transform: scale(.97); }
   button.pick { transition: none; }
   button.pick:active { transform: none; }
 }
+
+.widget-demo-link { color: var(--demo-accent); text-underline-offset: 4px; }

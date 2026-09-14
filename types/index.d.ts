@@ -28,6 +28,8 @@ export interface AgentOrbOptions {
   onClick?: (e: MouseEvent) => void
   /** 自定义 document（测试 / 多窗口场景） */
   document?: Document
+  /** 关闭后由接入方自行提供 css；默认 true */
+  injectStyle?: boolean
 }
 
 export declare class AgentOrb {

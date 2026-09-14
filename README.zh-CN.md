@@ -1,5 +1,7 @@
 <h1 align="center">🔮 ai-orb</h1>
 
+> 网站客服入口：新增可选 [widget](./README.widget.md)，支持球 / 提示胶囊 / 对话面板，以及完整外部文案与国际化。
+
 <p align="center">
   <strong>一颗会表态的 AI 助手状态球。</strong><br>
   在想 · 干活中 · 等你回话 · 好了。零依赖，4 KB。

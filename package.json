@@ -35,7 +35,11 @@
       "types": "./types/vue.d.ts",
       "default": "./src/vue.js"
     },
-    "./package.json": "./package.json"
+    "./package.json": "./package.json",
+    "./widget": {
+      "types": "./types/widget.d.ts",
+      "default": "./src/widget.js"
+    }
   },
   "main": "./src/index.js",
   "types": "./types/index.d.ts",
@@ -44,7 +48,8 @@
     "types",
     "README.md",
     "README.zh-CN.md",
-    "LICENSE"
+    "LICENSE",
+    "README.widget.md"
   ],
   "peerDependencies": {
     "vue": "^3.3.0"

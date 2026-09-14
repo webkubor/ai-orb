@@ -100,6 +100,7 @@ export class AgentOrb {
    * @param {string} [opts.theme]       内置主题名（THEMES 的 key），不传则用 CSS 默认值
    * @param {object} [opts.labels]      覆盖无障碍文案（做多语言时用）
    * @param {(e: MouseEvent) => void} [opts.onClick]
+   * @param {boolean} [opts.injectStyle=true] 自动注入样式；Shadow DOM 内可自行引入 css
    * @param {Document} [opts.document]  自定义 document（测试 / 多窗口场景）
    */
   constructor(host, opts = {}) {
@@ -123,7 +124,7 @@ export class AgentOrb {
 
     this._theme = opts.theme || null
 
-    injectStyle(doc)
+    if (opts.injectStyle !== false) injectStyle(doc)
     this._build(host, opts)
     this._applyTheme()
     this._render()

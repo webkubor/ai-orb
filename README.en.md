@@ -1,5 +1,7 @@
 <h1 align="center">🔮 ai-orb</h1>
 
+> Optional [website support widget](./README.widget.md): orb, notification capsule, chat panel and fully configurable localization.
+
 <p align="center">
   <strong>A tiny orb that shows what your AI assistant is doing.</strong><br>
   Thinking · working · waiting on you · done. Zero deps, 4 KB.

@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
+  <meta name="color-scheme" content="light dark">
+  <title>AI Orb · 网站客服演示</title>
+  <link rel="stylesheet" href="./embed.css">
+</head>
+<body>
+  <div class="demo-bar">
+    <a class="demo-brand" href="./index.html">ai-orb<span data-i18n="demoLabel">网站嵌入演示</span></a>
+    <div class="demo-settings">
+      <button id="theme-toggle" type="button" aria-pressed="false"><span data-i18n="darkBackground">深色背景</span></button>
+      <button id="language-toggle" type="button" aria-label="Switch to English">EN</button>
+      <a href="./showcase.html" data-i18n="gallery">状态球展厅</a>
+    </div>
+  </div>
+  <div class="site-shell">
+    <header class="site-header">
+      <a class="site-brand" href="#home" aria-label="橙间首页">
+        <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M4 16a12 12 0 0 1 24 0H4Z"/><path d="M4 20h24v4H4zM9 28h14v2H9z"/></svg>
+        <span data-i18n="brand">橙间</span>
+      </a>
+      <nav aria-label="示例网站导航">
+        <a href="#workspace" data-i18n="navProduct">产品</a>
+        <a href="#try-it" data-i18n="navExperience">体验客服</a>
+        <button class="text-button" data-open-assistant data-i18n="navContact" type="button">联系我们</button>
+      </nav>
+    </header>
+    <main id="home">
+      <section class="hero" aria-labelledby="hero-title">
+        <div class="hero-copy">
+          <p class="eyebrow"><span class="live-dot"></span><span data-i18n="exampleSite">一个工作空间产品的示例网站</span></p>
+          <h1 id="hero-title"><span data-i18n="heroLineOne">少一点忙乱，</span><br><span class="warm-text" data-i18n="heroLineTwo">多一点从容。</span></h1>
+          <p class="hero-description" data-i18n="heroDescription">把项目、想法和下一步放在一起。让团队专注于正在做的事，也为新的灵感留一点空间。</p>
+          <button class="primary-button" type="button" data-open-assistant><span data-i18n="heroAction">和橙间助手聊聊</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></button>
+          <p class="hero-note" data-i18n="heroNote">右下角的小球也在这里，随时可以找它。</p>
+        </div>
+        <div class="workspace" id="workspace" aria-label="示例工作空间预览">
+          <div class="workspace-top"><span class="window-dots" aria-hidden="true"><i></i><i></i><i></i></span><span data-i18n="workspaceName">设计工作室</span><span class="workspace-avatar">L</span></div>
+          <div class="workspace-content">
+            <p class="workspace-date" data-i18n="workspaceDate">周一 · 新的一周</p>
+            <h2 data-i18n="workspaceTitle">今天，留些时间给创造。</h2>
+            <div class="workspace-section-label"><span data-i18n="workspaceProjects">进行中的项目</span><span class="subtle-label" data-i18n="workspaceExample">示例内容</span></div>
+            <div class="project-row"><span class="project-icon coral"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 9 5-9 5-9-5 9-5Zm-9 9 9 5 9-5M3 16l9 5 9-5"/></svg></span><span class="project-detail"><strong data-i18n="projectOne">品牌焕新计划</strong><small data-i18n="projectOneDetail">把好想法变成清晰的表达</small></span><span class="project-badge" data-i18n="projectOneStatus">设计中</span></div>
+            <div class="project-row"><span class="project-icon sage"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="m8 12 3 3 5-6"/></svg></span><span class="project-detail"><strong data-i18n="projectTwo">夏日灵感收集</strong><small data-i18n="projectTwoDetail">为下一次创作留一点好奇</small></span><span class="project-badge" data-i18n="projectTwoStatus">整理中</span></div>
+            <div class="note-card"><span class="note-line"></span><div><strong data-i18n="noteTitle">一个小提醒</strong><p data-i18n="noteBody">不必一次做完所有事。先从最重要的那件开始。</p></div></div>
+          </div>
+          <div class="workspace-bottom"><span class="quiet-dot"></span><span data-i18n="workspaceBottom">给想法一个地方，给工作一点秩序。</span></div>
+        </div>
+      </section>
+      <section class="try-section" id="try-it" aria-labelledby="try-title">
+        <div class="try-heading"><div><p class="eyebrow" data-i18n="tryEyebrow">试试这个小助手</p><h2 id="try-title" data-i18n="tryTitle">每一种状态，都有回应。</h2></div><p data-i18n="tryDescription">切换状态，看看右下角。或直接打开对话，发送你的第一个问题。</p></div>
+        <fieldset class="state-fieldset"><legend class="sr-only" data-i18n="stateLegend">预览助手状态</legend><div class="state-controls">
+          <button type="button" data-state="idle" aria-pressed="true"><span class="state-mark idle"></span><span data-i18n="stateIdle">随时待命</span></button>
+          <button type="button" data-state="thinking" aria-pressed="false"><span class="state-mark thinking"></span><span data-i18n="stateThinking">正在思考</span></button>
+          <button type="button" data-state="working" aria-pressed="false"><span class="state-mark working"></span><span data-i18n="stateWorking">正在处理</span></button>
+          <button type="button" data-state="asking" aria-pressed="false"><span class="state-mark asking"></span><span data-i18n="stateAsking">等你补充</span></button>
+          <button type="button" data-state="done" aria-pressed="false"><span class="state-mark done"></span><span data-i18n="stateDone">已经完成</span></button>
+          <button type="button" data-state="error" aria-pressed="false"><span class="state-mark error"></span><span data-i18n="stateError">遇到问题</span></button>
+        </div></fieldset>
+        <div class="try-foot"><p id="state-description" role="status" data-i18n="idleDescription">安静待在角落，点击小球就能开始聊天。</p><button class="text-button" id="reset-preview" type="button" data-i18n="resetPreview">回到待命</button></div>
+      </section>
+    </main>
+    <footer class="site-footer"><p data-i18n="disclaimer">这是 ai-orb 的本地交互演示。橙间为虚构产品，回复为本地模拟，不会发送到服务器。</p><a href="./index.html" data-i18n="backToOrb">探索 ai-orb</a></footer>
+  </div>
+  <script type="module" src="./embed.js"></script>
+</body>
+</html>

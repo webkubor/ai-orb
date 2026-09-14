@@ -1,5 +1,7 @@
 <h1 align="center">🔮 ai-orb</h1>
 
+> Optional [website support widget](./README.widget.md): orb, notification capsule, chat panel and fully configurable localization.
+
 <p align="center">
   <strong>一颗会表态的 AI 助手状态球。</strong><br>
   在想 · 干活中 · 等你回话 · 好了。零依赖，4 KB。
