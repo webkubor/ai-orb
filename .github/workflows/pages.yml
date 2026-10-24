@@ -34,10 +34,16 @@ jobs:
           cp demo/embed* _site/
           sed -i "s|'../src/widget.js'|'./src/widget.js'|" _site/embed.js
           cp demo/showcase.html _site/showcase.html
+          cp demo/promo.html _site/promo.html
+          cp -r demo/media _site/media
           cp -r src _site/src
-          # demo 里写的是 ../src/index.js，提到根之后要改成 ./src/
-          sed -i "s|'../src/index.js'|'./src/index.js'|" _site/index.html
-          grep -q "'./src/index.js'" _site/index.html || { echo "::error::import 路径没改成功，线上会 404"; exit 1; }
+          # demo 里写的是 ../src/xxx.js，提到根之后要改成 ./src/（index 与 creatures 两个入口都要改）
+          for f in _site/index.html _site/promo.html; do
+            sed -i "s|'../src/|'./src/|g" "$f"
+            if grep -q "'../src/" "$f"; then echo "::error::$f 里还有 ../src/ 路径，线上会 404"; exit 1; fi
+          done
+          grep -q "'./src/creatures.js'" _site/index.html || { echo "::error::展示页没加载生灵插件，3.0 展区会是空的"; exit 1; }
+          test -f _site/media/ai-orb-3.mp4 || { echo "::error::推广视频没带上"; exit 1; }
 
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
