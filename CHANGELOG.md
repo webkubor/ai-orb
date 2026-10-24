@@ -2,6 +2,21 @@
 
 格式参考 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)。
 
+## [3.0.0] - 2026-10-25
+
+### 新增
+
+- **生灵形态 `creature`**：cat / bunny / dragon / owl / sprout / axolotl / bear / chick。圆润身体 + 物种特征（耳、角、翅、鳃、尾、呆毛）+ 大眼双高光 + 腮红 + 嘴，设置后优先于 `shape`
+- **情绪 `mood`**：neutral / happy / curious / focused / playful / sparkle / zen / surprised；生灵的嘴型随情绪与状态切换
+- **几何形态扩充**：diamond / hex / shield / drop / bean / star
+- **独立律动 `motion`**：breathe / float / bounce / pulse / orbit，多实例相位错开
+- **交互**：光标靠近竖耳、腮红变深；鼠标停下后东张西望；耳朵不定时抖动；`poke()` 果冻回弹并喷星光；在它身上来回划动触发「摸摸」，冒爱心并回调 `onPet`（Vue：`@pet`）
+- 主题新增 `--ao-cheek`（腮红 / 耳内 / 鳃）
+
+### 变更
+
+- 跟随鼠标的倾斜挤压与 CSS 律动拆到不同节点（`.ao-body-wrap` / `.ao-bob`），律动不再覆盖跟随
+
 ## [0.2.0] - 2026-09-14
 
 主发布：

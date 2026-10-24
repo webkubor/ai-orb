@@ -48,6 +48,28 @@ new AgentOrb(el, { shape: 'pill' })      // 胶囊
 |---|---|---|
 | 圆球（默认） | 圆角方块 | 胶囊 |
 
+## 生灵形态（3.0）
+
+不想要一颗球？给它一个物种：
+
+```js
+new AgentOrb(el, { creature: 'cat', theme: 'violet', mood: 'curious', motion: 'bounce' })
+```
+
+| `creature` | 特征 |
+|---|---|
+| `cat` | 猫耳、胡须、会摆的尾巴 |
+| `bunny` | 长耳，平时耷拉一只，看到你才竖起来 |
+| `dragon` | 龙角、小翅膀，靠近时扑腾 |
+| `owl` | 耳羽、大眼圈、喙 |
+| `sprout` | 头顶会摇的嫩芽 |
+| `axolotl` | 一直在飘的鳃 |
+| `bear` | 圆耳、鼻头 |
+| `chick` | 呆毛、喙、小翅膀 |
+
+表情 `mood`：`neutral` `happy` `curious` `focused` `playful` `sparkle` `zen` `surprised`，嘴型跟着变。
+交互：光标靠近会竖耳；鼠标停下它会东张西望；`orb.poke()` 果冻回弹冒星光；在它身上来回划动就是「摸摸」，冒爱心并触发 `onPet`（Vue 里是 `@pet`）。
+
 ## 八色主题
 
 ```js
