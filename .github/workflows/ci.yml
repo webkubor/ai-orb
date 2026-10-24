@@ -35,12 +35,23 @@ jobs:
             exit 1
           fi
 
-      - name: gzip 后不得超过 6 KB
+      - name: 核心包 gzip 后不得超过 7.5 KB
         run: |
           npx --yes esbuild src/index.js --bundle --minify --format=esm --outfile=/tmp/ao.js --log-level=error
           size=$(gzip -9 -c /tmp/ao.js | wc -c)
-          echo "gzipped: $size bytes"
-          if [ "$size" -gt 6144 ]; then
-            echo "::error::体积涨到 $size 字节，超过 6 KB 上限。要么瘦回去，要么改 README 里的数字"
+          echo "core gzipped: $size bytes"
+          if [ "$size" -gt 7680 ]; then
+            echo "::error::核心包涨到 $size 字节，超过 7.5 KB 上限。要么瘦回去，要么改 README 里的数字"
+            exit 1
+          fi
+
+      # 生灵形态是可选插件，单独计量：不用它的人不该为它付体积
+      - name: 生灵插件 gzip 后不得超过 4.5 KB
+        run: |
+          npx --yes esbuild src/creatures.js --bundle --minify --format=esm --outfile=/tmp/ao-creatures.js --log-level=error
+          size=$(gzip -9 -c /tmp/ao-creatures.js | wc -c)
+          echo "creatures gzipped: $size bytes"
+          if [ "$size" -gt 4608 ]; then
+            echo "::error::生灵插件涨到 $size 字节，超过 4.5 KB 上限。要么瘦回去，要么改 README 里的数字"
             exit 1
           fi

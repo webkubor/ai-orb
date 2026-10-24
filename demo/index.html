@@ -74,6 +74,23 @@
   .theme small { color: #7d746a; font-size: 11.5px; }
   .dot-btn { display: inline-flex; align-items: center; gap: 6px; }
   .dot-btn::before { content: ''; width: 10px; height: 10px; border-radius: 50%; background: var(--dot, #888); }
+  /* 3.0 主展区 */
+  .v3 { margin-bottom: 64px; }
+  .v3-badge { display: inline-block; font: 600 12px/1 ui-monospace, monospace; letter-spacing: .12em; color: #1a120c;
+    background: linear-gradient(120deg, #ffc79a, #ff8a50 45%, #f0abfc); padding: 6px 10px; border-radius: 999px; margin-bottom: 14px; }
+  .v3 h2.big { font-size: 26px; letter-spacing: -.01em; text-transform: none; color: #f2ece5; margin-bottom: 8px; }
+  .v3 .lead { color: #a89e93; margin: 0 0 22px; }
+  .promo-video { width: 100%; aspect-ratio: 16 / 9; border-radius: 16px; display: block; background: #0d0b09;
+    border: 1px solid rgba(255,255,255,.08); box-shadow: 0 30px 80px rgba(0,0,0,.45); }
+  .promo-links { display: flex; gap: 10px; flex-wrap: wrap; margin: 14px 0 34px; }
+  .promo-links a { padding: 7px 14px; border-radius: 999px; border: 1px solid rgba(255,255,255,.12); color: #e8dfd5;
+    text-decoration: none; font-size: 13px; }
+  .promo-links a:hover { border-color: #ff8a50; color: #ffb27d; }
+  .zoo { display: grid; grid-template-columns: repeat(auto-fit, minmax(104px, 1fr)); gap: 12px; }
+  .zoo .cell { padding: 22px 8px 14px; }
+  .zoo-hint { color: #7d746a; font-size: 13px; margin: 14px 0 0; }
+  .classic-mark { display: inline-block; margin-left: 8px; padding: 2px 8px; border-radius: 6px; font-size: 11px;
+    letter-spacing: .06em; color: #a89e93; border: 1px solid rgba(255,255,255,.1); text-transform: none; }
   footer { margin-top: 60px; color: #5f574f; font-size: 12.5px; text-align: center; }
   footer a { color: #a89e93; }
 </style>
@@ -89,8 +106,34 @@
     <br>把鼠标在页面上移动，它们都会看着你。
   </p>
 
+  <section class="v3">
+    <span class="v3-badge">NEW · 3.0</span>
+    <h2 class="big">生灵形态：它有了脸，也有了物种</h2>
+    <p class="lead">8 个物种 · 8 种表情 · 鼠标靠近会竖耳朵 · 戳一下会回弹 · 来回摸摸会害羞冒爱心。经典的球体形态一个没少，下面照样能用。</p>
+
+    <video class="promo-video" src="./media/ai-orb-3.mp4" autoplay muted loop playsinline preload="metadata"
+      aria-label="ai-orb 3.0 演示视频"></video>
+    <div class="promo-links">
+      <a href="./media/ai-orb-3.mp4" download>下载 MP4（1080p）</a>
+      <a href="./media/ai-orb-3.gif" download>下载 GIF</a>
+      <a href="./promo.html">打开实时演示页</a>
+    </div>
+
+    <h2>亲手试试 · 在它们身上来回划一划</h2>
+    <div class="zoo" id="zoo"></div>
+    <fieldset style="margin-top:16px"><legend>表情</legend><div class="btns" id="moodPicks"></div></fieldset>
+    <p class="zoo-hint">生灵是可选插件，不加载时核心包不变：<code>import 'ai-orb/creatures'</code></p>
+    <pre style="margin-top:14px">import { AgentOrb } from 'ai-orb'
+import 'ai-orb/creatures'
+
+const orb = new AgentOrb(el, { creature: 'cat', theme: 'violet', motion: 'bounce' })
+orb.mood = 'sparkle'     // 8 种表情，嘴型跟着变
+orb.poke()               // 戳一下：果冻回弹 + 星光
+// 摸摸：在它身上来回划动会触发 onPet</pre>
+  </section>
+
   <section>
-    <h2>试试看</h2>
+    <h2>试试看<span class="classic-mark">经典形态 · 2.x 起</span></h2>
     <div class="stage">
       <div class="preview"><div id="playground"></div><strong id="statusName">待命</strong><span id="statusHint">点击状态球，开始演示</span><button class="pick" id="runDemo" type="button">演示处理流程</button></div>
       <div class="stage-copy">
@@ -104,7 +147,7 @@
   </section>
 
   <section>
-    <h2>六个状态</h2>
+    <h2>六个状态<span class="classic-mark">经典形态 · 2.x 起</span></h2>
     <div class="grid" id="grid"></div>
   </section>
 
@@ -126,7 +169,7 @@ orb.destroy()            // 卸载时记得清理</pre>
   </section>
 
   <section>
-    <h2>换形态：shape 选项</h2>
+    <h2>换形态：shape 选项<span class="classic-mark">3 种经典 + 6 种 3.0 新增</span></h2>
     <div class="theme-row" id="shapes"></div>
   </section>
 
@@ -136,7 +179,41 @@ orb.destroy()            // 卸载时记得清理</pre>
 </div>
 
 <script type="module">
-import { AgentOrb, THEMES, SHAPES } from '../src/index.js'
+import { AgentOrb, THEMES, SHAPES, MOODS } from '../src/index.js'
+import '../src/creatures.js'
+
+// 3.0 生灵：8 个物种，各配一个主题和律动
+const ZOO = [
+  ['dragon', 'gold', '小龙', 'breathe'], ['cat', 'violet', '猫', 'breathe'], ['owl', 'blue', '猫头鹰', 'pulse'],
+  ['bunny', 'rose', '兔子', 'float'], ['sprout', 'green', '芽芽', 'bounce'], ['axolotl', 'cyan', '蝾螈', 'orbit'],
+  ['bear', 'orange', '熊', 'breathe'], ['chick', 'gold', '小鸡', 'bounce'],
+]
+const MOOD_NAMES = { neutral: '平常', happy: '开心', curious: '好奇', focused: '专注', playful: '俏皮', sparkle: '星星眼', zen: '入定', surprised: '惊讶' }
+const zooOrbs = []
+const zoo = document.getElementById('zoo')
+for (const [creature, theme, name, motion] of ZOO) {
+  const cell = document.createElement('div')
+  cell.className = 'cell'
+  const slot = document.createElement('div')
+  const b = document.createElement('b'); b.textContent = name
+  const s = document.createElement('small'); s.textContent = creature
+  cell.append(slot, b, s)
+  zoo.append(cell)
+  const orb = new AgentOrb(slot, { creature, theme, motion, size: 72 })
+  orb.el.addEventListener('click', () => orb.poke())
+  zooOrbs.push(orb)
+}
+const moodPicks = document.getElementById('moodPicks')
+for (const mood of MOODS) {
+  const btn = document.createElement('button')
+  btn.className = 'pick' + (mood === 'neutral' ? ' on' : '')
+  btn.textContent = MOOD_NAMES[mood] || mood
+  btn.onclick = () => {
+    zooOrbs.forEach((o, i) => setTimeout(() => { o.mood = mood }, i * 35))
+    moodPicks.querySelectorAll('.pick').forEach((x) => x.classList.toggle('on', x === btn))
+  }
+  moodPicks.append(btn)
+}
 
 const STATES = [
   ['idle',     '待命',     '只呼吸。常驻状态，多余动效会变成噪音。'],
@@ -198,7 +275,7 @@ for (const [key, vars] of Object.entries(THEMES)) {
 }
 
 // 形态选择器
-const SHAPE_NAMES = { circle: '圆球', squircle: '方块', pill: '胶囊' }
+const SHAPE_NAMES = { circle: '圆球', squircle: '方块', pill: '胶囊', diamond: '菱晶', hex: '六边', shield: '护盾', drop: '水滴', bean: '豆子', star: '星芒' }
 const shapePicks = document.getElementById('shapePicks')
 let curShape = 'circle'
 for (const shape of SHAPES) {
@@ -271,8 +348,8 @@ for (const [name, key] of THEMES_SHOW) {
   new AgentOrb(slot, { state: 'working', theme: key })
 }
 
-// 形态展示：三种形态 × 六个状态
-const SHAPE_SHOW = { circle: '圆球', squircle: '方块', pill: '胶囊' }
+// 形态展示：经典三种 + 3.0 新增六种
+const SHAPE_SHOW = SHAPE_NAMES
 const shapes = document.getElementById('shapes')
 for (const shape of SHAPES) {
   const box = document.createElement('div')

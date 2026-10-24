@@ -1,6 +1,6 @@
 {
   "name": "ai-orb",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "A tiny SVG orb that shows what your AI assistant is doing — thinking, working, waiting on you, done. Zero dependencies.",
   "keywords": [
     "ai",
@@ -25,7 +25,9 @@
     "url": "https://github.com/webkubor/ai-orb/issues"
   },
   "type": "module",
-  "sideEffects": false,
+  "sideEffects": [
+    "./src/creatures.js"
+  ],
   "exports": {
     ".": {
       "types": "./types/index.d.ts",
@@ -36,6 +38,10 @@
       "default": "./src/vue.js"
     },
     "./package.json": "./package.json",
+    "./creatures": {
+      "types": "./types/creatures.d.ts",
+      "default": "./src/creatures.js"
+    },
     "./widget": {
       "types": "./types/widget.d.ts",
       "default": "./src/widget.js"
@@ -72,6 +78,7 @@
   "devDependencies": {
     "@vue/server-renderer": "^3.5.41",
     "jsdom": "^30.0.1",
+    "playwright-core": "^1.64.1",
     "vue": "^3.5.41"
   }
 }

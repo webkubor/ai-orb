@@ -2,6 +2,21 @@
 
 格式参考 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)。
 
+## [3.0.1] - 2026-10-25
+
+### 变更
+
+- **生灵形态拆成可选插件 `ai-orb/creatures`**：不 import 时核心包与 2.x 用法完全一致，传 `creature` 只会回落到 `shape`。核心 gzip 约 7.1 KB，插件约 3.8 KB，CI 分别设门禁
+- 戳 / 摸摸的粒子随球的尺寸缩放；爱心改为固定亮粉色，各主题下都看得清
+- 样式字符串去掉注释与多余空白
+
+### 新增
+
+- `demo/promo.html` 推广短片拍摄页 + `scripts/record-promo.mjs` 一键录制 → `demo/media/ai-orb-3.mp4`（1080p H.264）与 `.gif`
+- 展示页新增 3.0 主展区（视频、8 个可互动生灵、表情切换），经典形态各区保留
+
+> 3.0.0 只发布过 GitHub tag、未上 npm；npm 上的第一个 3.x 版本是 3.0.1。
+
 ## [3.0.0] - 2026-10-25
 
 ### 新增

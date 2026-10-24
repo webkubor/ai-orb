@@ -9,6 +9,7 @@ export declare const STATES: readonly OrbState[]
 export declare const SHAPES: readonly ShapeName[]
 export declare const MOODS: readonly MoodName[]
 export declare const MOTIONS: readonly MotionMode[]
+/** 已注册的生灵；加载 ai-orb/creatures 前为空 */
 export declare const CREATURES: readonly CreatureName[]
 export declare const DEFAULT_LABELS: Record<OrbState, string>
 export declare const THEMES: Record<ThemeName, Record<string, string>>
@@ -70,6 +71,6 @@ export declare class AgentOrb {
 }
 
 export declare const css: string
-export declare function injectStyle(doc?: Document): void
+export declare function injectStyle(doc?: Document, text?: string, key?: string): void
 
 export default AgentOrb

@@ -4,7 +4,7 @@
 
 <p align="center">
   <strong>一颗会表态的 AI 助手状态球。</strong><br>
-  在想 · 干活中 · 等你回话 · 好了。零依赖，4 KB。
+  在想 · 干活中 · 等你回话 · 好了。零依赖，核心约 7 KB（gzip），生灵插件按需加载。
 </p>
 
 <p align="center">
@@ -50,9 +50,12 @@ new AgentOrb(el, { shape: 'pill' })      // 胶囊
 
 ## 生灵形态（3.0）
 
-不想要一颗球？给它一个物种：
+不想要一颗球？给它一个物种。生灵是可选插件（gzip 约 3.8 KB），不加载时核心包和 2.x 用法完全不变：
 
 ```js
+import { AgentOrb } from 'ai-orb'
+import 'ai-orb/creatures'
+
 new AgentOrb(el, { creature: 'cat', theme: 'violet', mood: 'curious', motion: 'bounce' })
 ```
 

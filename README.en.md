@@ -4,7 +4,7 @@
 
 <p align="center">
   <strong>A tiny orb that shows what your AI assistant is doing.</strong><br>
-  Thinking · working · waiting on you · done. Zero deps, 4 KB.
+  Thinking · working · waiting on you · done. Zero deps, ~7 KB gzipped core, creatures are an opt-in plugin.
 </p>
 
 <p align="center">

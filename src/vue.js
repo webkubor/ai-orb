@@ -2,7 +2,7 @@
  * ai-orb 3.0 Vue 3 组件封装
  */
 import { defineComponent, h, onBeforeUnmount, onMounted, ref, watch } from 'vue'
-import { AgentOrb as Core, STATES, SHAPES, MOODS, MOTIONS, CREATURES } from './index.js'
+import { AgentOrb as Core, STATES, SHAPES, MOODS, MOTIONS } from './index.js'
 
 export const AgentOrb = defineComponent({
   name: 'AgentOrb',
@@ -23,8 +23,8 @@ export const AgentOrb = defineComponent({
     squish: { type: Boolean, default: true },
     /** 眨眼 */
     blink: { type: Boolean, default: true },
-    /** 生灵：cat/bunny/dragon/owl/sprout/axolotl/bear/chick，设置后优先于 shape，只在挂载时读取 */
-    creature: { type: String, default: undefined, validator: (v) => !v || CREATURES.includes(v) },
+    /** 生灵：cat/bunny/dragon/owl/sprout/axolotl/bear/chick，需先 import 'ai-orb/creatures'；只在挂载时读取 */
+    creature: { type: String, default: undefined },
     /** 几何形态：circle/squircle/pill/diamond/hex/shield/drop/bean/star */
     shape: { type: String, default: undefined, validator: (v) => !v || SHAPES.includes(v) },
     /** 内置主题名 */

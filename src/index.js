@@ -5,13 +5,13 @@
  * 两种外观：
  *   · shape：9 种几何轮廓（circle, squircle, pill, diamond, hex, shield, drop, bean, star）
  *   · creature：8 种生灵（cat, bunny, dragon, owl, sprout, axolotl, bear, chick），
- *     有耳朵 / 角 / 翅 / 鳃、大眼高光、腮红和嘴，优先于 shape
+ *     有耳朵 / 角 / 翅 / 鳃、大眼高光、腮红和嘴，优先于 shape。
+ *     是可选插件：import 'ai-orb/creatures' 之后才可用，核心包不为它付体积
  *
  * 交互：眼睛跟随鼠标；光标靠近时竖耳、腮红变深；鼠标停下后自己东张西望；
  * poke() 果冻回弹并喷出星光；在它身上来回划动（摸摸）会害羞冒爱心，触发 onPet。
  */
 import { injectStyle } from './style.js'
-import { CREATURES, creatureSvg, hasBeak } from './creatures.js'
 
 /** 运行状态清单。 */
 export const STATES = ['idle', 'thinking', 'working', 'asking', 'done', 'error']
@@ -25,7 +25,15 @@ export const MOODS = ['neutral', 'happy', 'curious', 'focused', 'playful', 'spar
 /** 独立运动节奏模式 */
 export const MOTIONS = ['breathe', 'float', 'bounce', 'pulse', 'orbit']
 
-export { CREATURES }
+/** 已注册的生灵物种；加载 ai-orb/creatures 前为空 */
+export const CREATURES = []
+let creatureKit = null
+
+/** 由 ai-orb/creatures 调用，注册生灵的绘制与样式 */
+export function defineCreatures(kit) {
+  creatureKit = kit
+  for (const k of kit.kinds) if (!CREATURES.includes(k)) CREATURES.push(k)
+}
 
 /** 默认无障碍文案 */
 export const DEFAULT_LABELS = {
@@ -280,9 +288,10 @@ export class AgentOrb {
     if (opts.onClick) btn.addEventListener('click', opts.onClick)
 
     if (this._creature) {
+      if (opts.injectStyle !== false) injectStyle(doc, creatureKit.css, 'data-agent-orb-creatures')
       btn.classList.add('ao-creature', `ao-creature-${this._creature}`)
-      if (hasBeak(this._creature)) btn.classList.add('ao-has-beak')
-      btn.innerHTML = creatureSvg(this._creature, this._id)
+      if (creatureKit.hasBeak(this._creature)) btn.classList.add('ao-has-beak')
+      btn.innerHTML = creatureKit.svg(this._creature, this._id)
     } else {
       btn.innerHTML = this._geometrySvg()
     }
@@ -502,7 +511,7 @@ export class AgentOrb {
       const s = this._doc.createElement('span')
       s.className = `ao-particle ao-particle-${kind}`
       s.textContent = kind === 'heart' ? '♥' : '✦'
-      s.style.setProperty('--dx', `${((Math.random() * 2 - 1) * 24).toFixed(1)}px`)
+      s.style.setProperty('--dx', `calc(var(--ao-size) * ${((Math.random() * 2 - 1) * 0.42).toFixed(2)})`)
       s.style.setProperty('--rot', `${((Math.random() * 2 - 1) * 35).toFixed(0)}deg`)
       s.style.animationDelay = `${i * 70}ms`
       this.el.appendChild(s)

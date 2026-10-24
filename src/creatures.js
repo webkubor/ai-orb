@@ -1,5 +1,10 @@
 /**
- * 生灵形态（creature）：圆润身体 + 物种特征 + 大眼高光 + 腮红 + 嘴。
+ * 生灵形态（creature）插件：圆润身体 + 物种特征 + 大眼高光 + 腮红 + 嘴。
+ *
+ * 可选加载，核心包不含它：
+ *   import 'ai-orb/creatures'
+ *   new AgentOrb(el, { creature: 'cat' })
+ * 没加载插件时传 creature 会回落到 shape，老用法和体积都不受影响。
  *
  * 几何形态（shape）只改轮廓，读起来仍是「一颗球」；生灵形态让它有物种可认——
  * 耳朵会竖、尾巴会摆、鳃会飘。所有零件按「身后 / 身前」两层拼装：
@@ -8,7 +13,9 @@
  * 坐标系与几何形态一致（viewBox 0 0 64 64），身体底部在 y≈57，脚踩在 y≈60 的影子上。
  */
 
-export const CREATURES = ['cat', 'bunny', 'dragon', 'owl', 'sprout', 'axolotl', 'bear', 'chick']
+import { defineCreatures } from './index.js'
+
+const KINDS = ['cat', 'bunny', 'dragon', 'owl', 'sprout', 'axolotl', 'bear', 'chick']
 
 const BODY = 'M32 16 C46.5 16 55 26.5 55 40 C55 51.5 46 57 32 57 C18 57 9 51.5 9 40 C9 26.5 17.5 16 32 16 Z'
 
@@ -78,7 +85,7 @@ const PARTS = {
   }),
 }
 
-export function hasBeak(kind) {
+function hasBeak(kind) {
   return Boolean(PARTS[kind]?.('').beak)
 }
 
@@ -117,7 +124,7 @@ const MOUTHS = `
   <path class="ao-mouth ao-mouth-wave ao-mouth-stroke" d="M28 45 q1 -1.5 2 0 q1 1.5 2 0 q1 -1.5 2 0 q1 1.5 2 0"/>
   <path class="ao-mouth ao-mouth-calm ao-mouth-stroke" d="M29.5 43.8 q2.5 2 5 0"/>`
 
-export function creatureSvg(kind, id) {
+function creatureSvg(kind, id) {
   const fill = `url(#${id})`
   const parts = PARTS[kind](fill)
   return `
@@ -148,3 +155,9 @@ export function creatureSvg(kind, id) {
 </svg>
 <span class="ao-badge"></span>`
 }
+
+export const creatureCss = `.ao-creature .ao-body-wrap,.ao-creature .ao-bob{transform-origin:32px 58px}.ao-creature.ao-motion-breathe .ao-bob{animation:ao-squish 3.4s ease-in-out infinite;animation-delay:var(--ao-phase)}.ao-creature.ao-motion-pulse .ao-bob{animation:ao-squish 1.7s ease-in-out infinite;animation-delay:var(--ao-phase)}.ao-shadow{fill:rgba(0,0,0,0.28);transform-origin:32px 60.5px;animation:ao-shadow 3.4s ease-in-out infinite;animation-delay:var(--ao-phase)}.ao-motion-bounce .ao-shadow{animation:ao-shadow-hop 2.8s cubic-bezier(0.28,0.84,0.42,1) infinite;animation-delay:var(--ao-phase)}.ao-motion-float .ao-shadow,.ao-motion-orbit .ao-shadow{animation:ao-shadow-float 3.6s ease-in-out infinite;animation-delay:var(--ao-phase)}.is-error.ao-creature .ao-eye{display:none !important}.is-error.ao-creature .ao-eye-cross{display:block !important}.ao-eyeball{transform-box:fill-box;transform-origin:center;transition:transform 0.08s ease-in}.agent-orb.ao-blink .ao-eyeball{transform:scaleY(0.1)}.ao-creature.ao-blink .ao-pupil{transform:none}.ao-glint{fill:#fff}.ao-star-glint{transform-box:fill-box;transform-origin:center;animation:ao-twinkle 1.8s ease-in-out infinite}.ao-thick{stroke-width:3}.ao-ink{fill:var(--ao-ink)}.ao-c-hi{fill:var(--ao-hi)}.ao-c-mid{fill:var(--ao-mid)}.ao-c-lo{fill:var(--ao-lo)}.ao-c-cheek{fill:var(--ao-cheek)}.ao-thin{fill:none;stroke:var(--ao-ink);stroke-width:1.2;stroke-linecap:round;opacity:0.5}.ao-stem{fill:none;stroke:var(--ao-lo);stroke-width:2;stroke-linecap:round}.ao-leaf{fill:var(--ao-hi);stroke:var(--ao-lo);stroke-width:1;stroke-linejoin:round}.ao-gill{fill:none;stroke:var(--ao-accent,var(--ao-cheek));stroke-width:3.4;stroke-linecap:round}.ao-beak{fill:#f6a63a;stroke:#c97a1c;stroke-width:0.6;stroke-linejoin:round}.ao-tongue{fill:#ff7a93}.ao-blush ellipse{fill:var(--ao-cheek)}.ao-blush{opacity:0.42;transition:opacity 0.3s ease}.ao-near .ao-blush,.ao-mood-happy .ao-blush,.is-done .ao-blush,.ao-petted .ao-blush{opacity:0.9}.ao-mouth{display:none}.ao-mouth-stroke{fill:none;stroke:var(--ao-ink);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}[data-mouth="w"] .ao-mouth-w,[data-mouth="open"] .ao-mouth-open,[data-mouth="o"] .ao-mouth-o,[data-mouth="flat"] .ao-mouth-flat,[data-mouth="tongue"] .ao-mouth-tongue,[data-mouth="wave"] .ao-mouth-wave,[data-mouth="calm"] .ao-mouth-calm{display:block}.ao-has-beak .ao-mouths{display:none}.ao-part{transition:transform 0.28s cubic-bezier(0.34,1.56,0.64,1)}.ao-near .ao-part-l{transform:rotate(-9deg) scale(1.06)}.ao-near .ao-part-r{transform:rotate(9deg) scale(1.06)}.ao-twitch-l .ao-part-l{animation:ao-twitch-l 0.5s ease-in-out}.ao-twitch-r .ao-part-r{animation:ao-twitch-r 0.5s ease-in-out}.ao-creature-bunny .ao-part-r{transform:rotate(32deg)}.ao-creature-bunny.ao-near .ao-part-r{transform:rotate(6deg) scale(1.05)}.ao-near .ao-wing.ao-part-l{animation:ao-flap-l 0.34s ease-in-out infinite}.ao-near .ao-wing.ao-part-r{animation:ao-flap-r 0.34s ease-in-out infinite}.ao-sway{animation:ao-sway 2.8s ease-in-out infinite alternate;animation-delay:var(--ao-phase)}.ao-near .ao-sway{animation-duration:0.8s}.ao-gills-l{animation:ao-gill-l 2.2s ease-in-out infinite alternate}.ao-gills-r{animation:ao-gill-r 2.2s ease-in-out infinite alternate}.ao-near .ao-gills-l,.ao-near .ao-gills-r{animation-duration:0.6s}.ao-tail{transform-origin:49px 49px;animation:ao-tail 1.9s ease-in-out infinite alternate}.ao-near .ao-tail{animation-duration:0.5s}.ao-petted .ao-bob{animation:ao-jiggle 0.45s ease-in-out 3 !important}.ao-creature.ao-poked{transform-origin:50% 92%}@keyframes ao-squish{0%,100%{transform:scale(1,1)}50%{transform:scale(0.975,1.035)}}@keyframes ao-shadow{0%,100%{transform:scale(1)}50%{transform:scale(0.95)}}@keyframes ao-shadow-hop{0%,100%{transform:scale(1);opacity:1}25%{transform:scale(0.72);opacity:0.55}42%{transform:scale(1.06)}55%{transform:scale(1)}}@keyframes ao-shadow-float{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(0.84);opacity:0.7}}@keyframes ao-twitch-l{0%,100%{transform:rotate(0)}30%{transform:rotate(-16deg)}60%{transform:rotate(7deg)}}@keyframes ao-twitch-r{0%,100%{transform:rotate(0)}30%{transform:rotate(16deg)}60%{transform:rotate(-7deg)}}@keyframes ao-flap-l{0%,100%{transform:rotate(0)}50%{transform:rotate(-24deg)}}@keyframes ao-flap-r{0%,100%{transform:rotate(0)}50%{transform:rotate(24deg)}}@keyframes ao-sway{from{transform:rotate(-7deg)}to{transform:rotate(7deg)}}@keyframes ao-gill-l{from{transform:rotate(-6deg)}to{transform:rotate(9deg)}}@keyframes ao-gill-r{from{transform:rotate(6deg)}to{transform:rotate(-9deg)}}@keyframes ao-tail{from{transform:rotate(-8deg)}to{transform:rotate(14deg)}}@keyframes ao-jiggle{0%,100%{transform:scale(1,1)}25%{transform:scale(1.08,0.92) rotate(-3deg)}50%{transform:scale(0.95,1.06)}75%{transform:scale(1.05,0.95) rotate(3deg)}}@media (prefers-reduced-motion:reduce){.ao-shadow,.ao-part,.ao-sway,.ao-gills-l,.ao-gills-r,.ao-tail,.ao-star-glint{animation:none !important}.ao-eyeball,.ao-part{transition:none !important}}`
+
+defineCreatures({ kinds: KINDS, svg: creatureSvg, hasBeak, css: creatureCss })
+
+export { CREATURES } from './index.js'

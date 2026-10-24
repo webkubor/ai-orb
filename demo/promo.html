@@ -1,0 +1,333 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1280">
+<title>ai-orb 3.0 · promo</title>
+<!--
+  推广短片的「拍摄现场」：1280×720，打开就按脚本自动播放一遍（约 23 秒），结束后循环。
+  光标是画出来的假光标，它移动时会向 window 派发真实的 mousemove ——
+  所以眼睛跟随、竖耳朵、摸摸冒爱心全是库本身的行为，不是视频特效。
+
+  录制：node scripts/record-promo.mjs → demo/media/ai-orb-3.mp4 / .gif
+-->
+<style>
+  * { box-sizing: border-box; margin: 0; }
+  html, body { width: 1280px; height: 720px; overflow: hidden; background: #110f0d; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Segoe UI", sans-serif;
+    color: #f2ece5;
+    cursor: none;
+  }
+  .stage {
+    position: relative; width: 1280px; height: 720px; overflow: hidden;
+    background:
+      radial-gradient(900px 480px at 78% -8%, rgba(255, 138, 80, .13), transparent 62%),
+      radial-gradient(760px 460px at 8% 108%, rgba(139, 92, 246, .12), transparent 60%),
+      radial-gradient(600px 300px at 50% 60%, rgba(56, 189, 248, .06), transparent 70%),
+      #110f0d;
+  }
+  .grain {
+    position: absolute; inset: 0; pointer-events: none; opacity: .05; mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  .title {
+    position: absolute; top: 56px; left: 0; right: 0; text-align: center;
+    transition: opacity .6s ease, transform .6s ease;
+  }
+  .title h1 { font-size: 64px; font-weight: 800; letter-spacing: -.02em; }
+  .title h1 span {
+    background: linear-gradient(120deg, #ffc79a 0%, #ff8a50 35%, #f0abfc 70%, #7dd3fc 100%);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .title p { margin-top: 10px; font-size: 21px; color: #b9aea2; }
+  .title p small { display: block; margin-top: 6px; font-size: 15px; color: #7d746a; letter-spacing: .08em; }
+
+  .caption {
+    position: absolute; left: 0; right: 0; bottom: 78px; text-align: center;
+    opacity: 0; transform: translateY(10px); transition: opacity .45s ease, transform .45s ease;
+  }
+  .caption.on { opacity: 1; transform: none; }
+  .caption b { display: inline-block; font-size: 38px; font-weight: 700; letter-spacing: -.01em; }
+  .caption small { display: block; margin-top: 10px; font-size: 19px; color: #8f857a; letter-spacing: .1em; }
+
+  .row {
+    position: absolute; left: 0; right: 0; top: 236px;
+    display: flex; justify-content: center; gap: 6px;
+    transition: opacity .6s ease, transform .6s ease;
+  }
+  .row.hide { opacity: 0; transform: translateY(30px) scale(.94); }
+  .slot { display: grid; justify-items: center; gap: 14px; width: 142px; opacity: 0; transform: translateY(26px) scale(.6); }
+  .slot.in { animation: pop .62s cubic-bezier(.34, 1.56, .64, 1) forwards; }
+  .slot small { font-size: 17px; font-weight: 600; color: #a89e93; letter-spacing: .04em; }
+  @keyframes pop { to { opacity: 1; transform: none; } }
+
+  .classic {
+    position: absolute; left: 0; right: 0; top: 270px;
+    display: flex; justify-content: center; align-items: flex-end; gap: 40px;
+    opacity: 0; transform: translateY(30px); transition: opacity .6s ease, transform .6s ease;
+  }
+  .classic.on { opacity: 1; transform: none; }
+  .classic .cell { display: grid; justify-items: center; gap: 12px; }
+  .classic small { font-size: 17px; color: #a89e93; }
+
+  .end {
+    position: absolute; inset: 0; display: grid; place-content: center; justify-items: center; gap: 22px;
+    opacity: 0; transition: opacity .7s ease;
+  }
+  .end.on { opacity: 1; }
+  .end h2 { font-size: 56px; font-weight: 800; letter-spacing: -.02em; }
+  .end h2 span {
+    background: linear-gradient(120deg, #ffc79a, #ff8a50 40%, #f0abfc 75%, #7dd3fc);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .end pre {
+    font: 500 22px/1.7 ui-monospace, SFMono-Regular, Menlo, monospace; color: #e8dfd5;
+    padding: 18px 30px; border-radius: 14px; background: rgba(0, 0, 0, .35);
+    border: 1px solid rgba(255, 255, 255, .08);
+  }
+  .end pre i { font-style: normal; color: #7d746a; }
+  .end pre em { font-style: normal; color: #ffb27d; }
+  .end .tags { display: flex; gap: 12px; }
+  .end .tags span {
+    font-size: 15px; padding: 6px 14px; border-radius: 999px; color: #c9bfb4;
+    border: 1px solid rgba(255, 255, 255, .12); background: rgba(255, 255, 255, .03);
+  }
+  .end .url { font-size: 18px; color: #8f857a; letter-spacing: .04em; }
+  .end .mini { display: flex; gap: 14px; margin-top: 4px; }
+
+  .cursor {
+    position: absolute; left: 0; top: 0; width: 26px; height: 26px; pointer-events: none; z-index: 50;
+    opacity: 0; transition: opacity .3s ease;
+    filter: drop-shadow(0 4px 10px rgba(0, 0, 0, .5));
+  }
+  .cursor.on { opacity: 1; }
+  .cursor svg { transition: transform .12s ease; transform-origin: 4px 3px; }
+  .cursor.press svg { transform: scale(.82); }
+  .ripple {
+    position: absolute; width: 56px; height: 56px; margin: -28px 0 0 -28px; border-radius: 50%;
+    border: 2px solid rgba(255, 199, 154, .8); pointer-events: none; z-index: 49;
+    animation: ripple .55s ease-out forwards;
+  }
+  @keyframes ripple { from { transform: scale(.3); opacity: 1; } to { transform: scale(1.4); opacity: 0; } }
+</style>
+</head>
+<body>
+<div class="stage" id="stage">
+  <div class="title" id="title">
+    <h1><span>ai-orb</span> 3.0</h1>
+    <p>Your AI assistant now has a face — and a species.<small>AI 助手状态球 · 3.0 生灵形态</small></p>
+  </div>
+
+  <div class="row" id="row"></div>
+  <div class="classic" id="classic"></div>
+
+  <div class="caption" id="caption"><b></b><small></small></div>
+
+  <div class="end" id="end">
+    <h2><span>ai-orb</span> 3.0</h2>
+    <pre><i>$</i> npm i ai-orb
+<em>import</em> 'ai-orb/creatures'
+<em>new</em> AgentOrb(el, { creature: 'cat' })</pre>
+    <div class="tags"><span>Zero deps</span><span>Pure SVG</span><span>Vue 3</span><span>8 creatures · 8 moods</span></div>
+    <div class="url">github.com/webkubor/ai-orb</div>
+    <div class="mini" id="mini"></div>
+  </div>
+
+  <div class="cursor" id="cursor">
+    <svg viewBox="0 0 26 26" width="26" height="26"><path d="M4 3 L4 21 L9 16.5 L12.5 24 L15.8 22.5 L12.4 15.2 L19 15 Z" fill="#fff" stroke="#111" stroke-width="1.4" stroke-linejoin="round"/></svg>
+  </div>
+  <div class="grain"></div>
+</div>
+
+<script type="module">
+import { AgentOrb } from '../src/index.js'
+import '../src/creatures.js'
+
+const CAST = [
+  ['dragon', 'gold', 'Dragon'],
+  ['cat', 'violet', 'Cat'],
+  ['owl', 'blue', 'Owl'],
+  ['bunny', 'rose', 'Bunny'],
+  ['sprout', 'green', 'Sprout'],
+  ['axolotl', 'cyan', 'Axolotl'],
+  ['bear', 'orange', 'Bear'],
+  ['chick', 'gold', 'Chick'],
+]
+const MOTIONS = ['breathe', 'float', 'pulse', 'float', 'bounce', 'orbit', 'breathe', 'bounce']
+
+const $ = (id) => document.getElementById(id)
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms))
+
+let orbs = []
+let slots = []
+let classicOrbs = []
+let miniOrbs = []
+const cursor = { x: 640, y: 760, el: $('cursor') }
+
+function placeCursor(x, y) {
+  cursor.x = x; cursor.y = y
+  cursor.el.style.transform = `translate(${x - 4}px, ${y - 3}px)`
+  window.dispatchEvent(new MouseEvent('mousemove', { clientX: x, clientY: y }))
+}
+
+/** 光标沿缓动曲线移到目标点；每帧都派发真实 mousemove */
+function moveTo(x, y, ms, onStep) {
+  const sx = cursor.x, sy = cursor.y, t0 = performance.now()
+  const ease = (t) => (t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2)
+  return new Promise((resolve) => {
+    const tick = (now) => {
+      const t = Math.min(1, (now - t0) / ms)
+      const e = ease(t)
+      const px = cursor.x, py = cursor.y
+      placeCursor(sx + (x - sx) * e, sy + (y - sy) * e)
+      onStep?.(cursor.x - px, cursor.y - py)
+      t < 1 ? requestAnimationFrame(tick) : resolve()
+    }
+    requestAnimationFrame(tick)
+  })
+}
+
+function centerOf(el) {
+  const b = el.getBoundingClientRect()
+  return [b.left + b.width / 2, b.top + b.height / 2]
+}
+
+async function click(orb, mood) {
+  cursor.el.classList.add('press')
+  const r = document.createElement('div')
+  r.className = 'ripple'
+  r.style.left = cursor.x + 'px'; r.style.top = cursor.y + 'px'
+  $('stage').append(r)
+  setTimeout(() => r.remove(), 600)
+  orb.poke(mood)
+  await sleep(130)
+  cursor.el.classList.remove('press')
+}
+
+function caption(en, zh) {
+  const c = $('caption')
+  c.classList.remove('on')
+  return sleep(260).then(() => {
+    c.querySelector('b').textContent = en
+    c.querySelector('small').textContent = zh
+    if (en) c.classList.add('on')
+  })
+}
+
+function reset() {
+  for (const o of [...orbs, ...classicOrbs, ...miniOrbs]) o.destroy()
+  orbs = []; classicOrbs = []; miniOrbs = []
+  $('row').innerHTML = ''; $('classic').innerHTML = ''; $('mini').innerHTML = ''
+  $('row').classList.remove('hide'); $('classic').classList.remove('on'); $('end').classList.remove('on')
+  $('title').style.opacity = '1'; $('title').style.transform = 'none'
+  $('caption').classList.remove('on')
+  cursor.el.classList.remove('on')
+  placeCursor(640, 900)
+  slots = CAST.map(([creature, theme, name], i) => {
+    const slot = document.createElement('div')
+    slot.className = 'slot'
+    const host = document.createElement('div')
+    const label = document.createElement('small'); label.textContent = name
+    slot.append(host, label)
+    $('row').append(slot)
+    orbs.push(new AgentOrb(host, { creature, theme, size: 140, motion: MOTIONS[i] }))
+    return slot
+  })
+}
+
+async function play() {
+  reset()
+  await sleep(500)
+
+  // 1. 登场
+  for (const s of slots) { s.classList.add('in'); await sleep(140) }
+  await sleep(900)
+
+  // 2. 目光跟随
+  await caption('They watch your cursor', '眼睛跟着光标走 · 靠近会竖耳朵')
+  cursor.el.classList.add('on')
+  await moveTo(140, 560, 700)
+  await moveTo(1150, 540, 1900)
+  await moveTo(700, 210, 900)
+  await moveTo(330, 330, 900)
+
+  // 3. 戳
+  await caption('Poke them', '戳一下 · 果冻回弹，会给你反应')
+  for (const [i, mood] of [[1, 'playful'], [0, 'happy'], [4, 'surprised'], [6, 'sparkle']]) {
+    const [x, y] = centerOf(orbs[i].el)
+    await moveTo(x + 6, y + 8, 520)
+    await click(orbs[i], mood)
+    await sleep(380)
+  }
+
+  // 4. 摸摸
+  await caption('Pet them', '在它身上来回摸摸 · 会害羞冒爱心')
+  const bunny = orbs[3]
+  const [bx, by] = centerOf(bunny.el)
+  await moveTo(bx - 26, by + 6, 600)
+  const pet = (dx) => bunny.el.dispatchEvent(new PointerEvent('pointermove', { bubbles: true, movementX: dx, movementY: 0 }))
+  for (let k = 0; k < 6; k++) {
+    await moveTo(bx + 26, by + 6, 170, (dx) => pet(dx))
+    await moveTo(bx - 26, by + 6, 170, (dx) => pet(dx))
+  }
+  await sleep(700)
+
+  // 5. 表情
+  await caption('8 moods', '8 种表情 · 嘴型跟着变')
+  await moveTo(1240, 760, 600)
+  cursor.el.classList.remove('on')
+  for (const mood of ['happy', 'sparkle', 'surprised', 'playful', 'curious', 'zen', 'neutral']) {
+    orbs.forEach((o, i) => setTimeout(() => { o.mood = mood }, i * 40))
+    await sleep(520)
+  }
+  await sleep(300)
+
+  // 6. 经典形态
+  await caption('The classic orbs are still here', '2.x 的经典形态与六个状态全部保留')
+  $('row').classList.add('hide')
+  $('title').style.opacity = '.0'
+  const CLASSIC = [
+    ['circle', 'orange', 'thinking', 'thinking'],
+    ['circle', 'blue', 'working', 'working'],
+    ['squircle', 'violet', 'asking', 'asking'],
+    ['pill', 'green', 'done', 'done'],
+    ['circle', 'graphite', 'error', 'error'],
+    ['hex', 'cyan', 'idle', 'new: hex'],
+    ['diamond', 'gold', 'idle', 'new: diamond'],
+  ]
+  for (const [shape, theme, state, label] of CLASSIC) {
+    const cell = document.createElement('div')
+    cell.className = 'cell'
+    const host = document.createElement('div')
+    const cap = document.createElement('small'); cap.textContent = label
+    cell.append(host, cap)
+    $('classic').append(cell)
+    classicOrbs.push(new AgentOrb(host, { shape, theme, state, size: 112, unseen: state === 'done' ? 3 : 0 }))
+  }
+  await sleep(200)
+  $('classic').classList.add('on')
+  await sleep(3000)
+
+  // 7. 片尾
+  await caption('', '')
+  $('classic').classList.remove('on')
+  await sleep(400)
+  for (const [creature, theme] of CAST.slice(0, 6)) {
+    const host = document.createElement('div')
+    $('mini').append(host)
+    miniOrbs.push(new AgentOrb(host, { creature, theme, size: 56, motion: 'bounce' }))
+  }
+  $('end').classList.add('on')
+  placeCursor(640, 520)
+  await sleep(3800)
+
+  if (!new URLSearchParams(location.search).has('once')) play()
+  else document.body.dataset.done = '1'
+}
+
+play()
+</script>
+</body>
+</html>

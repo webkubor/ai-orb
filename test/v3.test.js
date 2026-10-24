@@ -60,6 +60,7 @@ test('3.0 poke() 触发果冻弹性挤压与临时情绪', (t, done) => {
   }, 700)
 })
 
+await import('../src/creatures.js')
 const { CREATURES } = await import('../src/index.js')
 
 test('creature：每个物种都渲染身体、可眨的眼球与腮红', () => {
