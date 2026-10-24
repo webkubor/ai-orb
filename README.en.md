@@ -22,6 +22,13 @@
 
 ---
 
+## 3.0 · Creatures
+
+<p align="center">
+  <a href="https://webkubor.github.io/ai-orb/"><img src="https://webkubor.github.io/ai-orb/media/ai-orb-3.gif" width="720" alt="ai-orb 3.0 creatures: eight species that watch your cursor, bounce when poked and blush when petted"></a>
+</p>
+<p align="center"><sub>8 species · 8 moods · eyes follow your cursor · bounce when poked · hearts when petted — <a href="https://webkubor.github.io/ai-orb/media/ai-orb-3.mp4">1080p video</a> · <a href="https://webkubor.github.io/ai-orb/">live demo</a><br>Creatures are an opt-in plugin. The classic orbs and all six states are still here, see below.</sub></p>
+
 ## See it once, you get it
 
 <p align="center">
@@ -47,6 +54,21 @@ new AgentOrb(el, { shape: 'pill' })      // capsule
 | `circle` | `squircle` | `pill` |
 |---|---|---|
 | Round (default) | Rounded square | Capsule |
+
+## Creatures (3.0)
+
+Want more than a ball? Give it a species. Creatures are an opt-in plugin (~3.8 KB gzipped); without it the core and the 2.x API are unchanged:
+
+```js
+import { AgentOrb } from 'ai-orb'
+import 'ai-orb/creatures'
+
+new AgentOrb(el, { creature: 'cat', theme: 'violet', mood: 'curious', motion: 'bounce' })
+```
+
+Species: `cat` `bunny` `dragon` `owl` `sprout` `axolotl` `bear` `chick`.
+Moods: `neutral` `happy` `curious` `focused` `playful` `sparkle` `zen` `surprised` — the mouth changes with them.
+Interaction: ears perk up when the cursor comes close; it looks around on its own when you stop moving; `orb.poke()` squashes and sparkles; stroking back and forth over it is a pet — hearts, plus an `onPet` callback (`@pet` in Vue).
 
 ## Eight themes
 

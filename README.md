@@ -22,6 +22,13 @@
 
 ---
 
+## 3.0 · 生灵形态
+
+<p align="center">
+  <a href="https://webkubor.github.io/ai-orb/"><img src="https://webkubor.github.io/ai-orb/media/ai-orb-3.gif" width="720" alt="ai-orb 3.0 生灵形态：8 个物种，眼睛跟着光标，戳一下回弹，摸摸冒爱心"></a>
+</p>
+<p align="center"><sub>8 个物种 · 8 种表情 · 眼睛跟着光标 · 戳一下回弹 · 摸摸冒爱心 —— <a href="https://webkubor.github.io/ai-orb/media/ai-orb-3.mp4">1080p 视频</a> · <a href="https://webkubor.github.io/ai-orb/">在线试玩</a><br>生灵是可选插件，经典的球体形态与六个状态全部保留，见下文。</sub></p>
+
 ## 看一眼就知道它在干嘛
 
 <p align="center">

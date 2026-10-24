@@ -23,6 +23,13 @@
 
 ---
 
+## 3.0 · 生灵形态
+
+<p align="center">
+  <a href="https://webkubor.github.io/ai-orb/"><img src="https://webkubor.github.io/ai-orb/media/ai-orb-3.gif" width="720" alt="ai-orb 3.0 生灵形态：8 个物种，眼睛跟着光标，戳一下回弹，摸摸冒爱心"></a>
+</p>
+<p align="center"><sub>8 个物种 · 8 种表情 · 眼睛跟着光标 · 戳一下回弹 · 摸摸冒爱心 —— <a href="https://webkubor.github.io/ai-orb/media/ai-orb-3.mp4">1080p 视频</a> · <a href="https://webkubor.github.io/ai-orb/">在线试玩</a><br>生灵是可选插件，经典的球体形态与六个状态全部保留，见下文。</sub></p>
+
 ## 看一眼就知道它在干嘛
 
 <p align="center">
@@ -37,6 +44,21 @@
 | `asking` | 助手问了话，卡在你这儿 | 轻轻左右摆，像在你视线边上晃手 |
 | `done` | 结果出来了 | 弹一下、笑眼、角标 |
 | `error` | 请求失败 | 褪成灰，不闪红 |
+
+## 生灵形态（3.0）
+
+不想要一颗球？给它一个物种。生灵是可选插件（gzip 约 3.8 KB），不加载时核心包和 2.x 用法完全不变：
+
+```js
+import { AgentOrb } from 'ai-orb'
+import 'ai-orb/creatures'
+
+new AgentOrb(el, { creature: 'cat', theme: 'violet', mood: 'curious', motion: 'bounce' })
+```
+
+可选物种：`cat` `bunny` `dragon` `owl` `sprout` `axolotl` `bear` `chick`。
+表情 `mood`：`neutral` `happy` `curious` `focused` `playful` `sparkle` `zen` `surprised`，嘴型跟着变。
+交互：光标靠近会竖耳；鼠标停下它会东张西望；`orb.poke()` 果冻回弹冒星光；在它身上来回划动就是「摸摸」，冒爱心并触发 `onPet`（Vue 里是 `@pet`）。
 
 ## 八色主题
 
