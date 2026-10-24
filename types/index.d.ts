@@ -1,64 +1,68 @@
 export type OrbState = 'idle' | 'thinking' | 'working' | 'asking' | 'done' | 'error'
 export type ThemeName = 'orange' | 'blue' | 'green' | 'violet' | 'rose' | 'gold' | 'cyan' | 'graphite'
-export type ShapeName = 'circle' | 'squircle' | 'pill'
+export type ShapeName = 'circle' | 'squircle' | 'pill' | 'diamond' | 'hex' | 'shield' | 'drop' | 'bean' | 'star'
+export type MoodName = 'neutral' | 'happy' | 'curious' | 'focused' | 'playful' | 'sparkle' | 'zen' | 'surprised'
+export type MotionMode = 'breathe' | 'float' | 'bounce' | 'pulse' | 'orbit'
 
 export declare const STATES: readonly OrbState[]
 export declare const SHAPES: readonly ShapeName[]
+export declare const MOODS: readonly MoodName[]
+export declare const MOTIONS: readonly MotionMode[]
 export declare const DEFAULT_LABELS: Record<OrbState, string>
 export declare const THEMES: Record<ThemeName, Record<string, string>>
 
 export interface AgentOrbOptions {
   /** 初始状态，默认 'idle'。未知值会回落到 'idle' 而不是抛错 */
   state?: OrbState | string
+  /** 初始情绪表情，默认 'neutral' */
+  mood?: MoodName | string
+  /** 独立运动节奏模式：breathe | float | bounce | pulse | orbit */
+  motion?: MotionMode | string
   /** 未读数，state='done' 且 >0 时显示角标 */
   unseen?: number
   /** 尺寸，数字按 px 处理；不传则用 CSS 里的 56px */
   size?: number | string
   /** 眼睛是否跟随鼠标，默认 true */
   follow?: boolean
+  /** 果冻弹性形变，默认 true */
+  squish?: boolean
   /** 是否眨眼，默认 true */
   blink?: boolean
-  /** 外形：circle（默认）/ squircle（圆角方块）/ pill（胶囊）。只在创建时读取 */
+  /** 外形几何：circle / squircle / pill / diamond / hex / shield / drop / bean / star */
   shape?: ShapeName
-  /** 内置主题名，不传则用 CSS 默认值。设新值立即生效 */
+  /** 内置主题名 */
   theme?: ThemeName | null
-  /** 覆盖无障碍文案，做多语言时用 */
+  /** 覆盖无障碍文案 */
   labels?: Partial<Record<OrbState, string>>
   /** 点击回调 */
   onClick?: (e: MouseEvent) => void
-  /** 自定义 document（测试 / 多窗口场景） */
+  /** 自定义 document */
   document?: Document
-  /** 关闭后由接入方自行提供 css；默认 true */
+  /** 自动注入样式；默认 true */
   injectStyle?: boolean
 }
 
 export declare class AgentOrb {
-  /**
-   * @param host 挂载点。球作为它的子节点插入，host 本身不会被替换。
-   * @throws 传入空 host 时抛错——静默失败会被当成样式问题查半天
-   */
   constructor(host: Element, options?: AgentOrbOptions)
 
-  /** 生成的 button 元素。想直接改 CSS 变量换主题就用它 */
   readonly el: HTMLButtonElement
 
   state: OrbState
+  mood: MoodName
+  motion: MotionMode | null
   unseen: number
-  /** 当前主题名，设新值立即生效 */
   theme: ThemeName | null
-  /** 外形，只在创建时读取，运行时不支持动态改 */
   readonly shape: ShapeName
 
-  /** 语义糖：orb.set('done', 3) */
+  /** 触发果冻弹性挤压微弹与临时情绪 */
+  poke(tempMood?: MoodName): this
+
   set(state: OrbState, unseen?: number): this
 
-  /** 摘监听、清定时器、移除 DOM。SPA 卸载时必须调 */
   destroy(): void
 }
 
-/** 全部样式的字符串形式。默认会自动注入，这个导出留给 SSR / 严格 CSP / 自管样式的场景 */
 export declare const css: string
-/** 手动注入样式，重复调用只注一次 */
 export declare function injectStyle(doc?: Document): void
 
 export default AgentOrb
