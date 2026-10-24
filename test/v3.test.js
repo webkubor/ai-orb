@@ -59,3 +59,45 @@ test('3.0 poke() 触发果冻弹性挤压与临时情绪', (t, done) => {
     done()
   }, 700)
 })
+
+const { CREATURES } = await import('../src/index.js')
+
+test('creature：每个物种都渲染身体、可眨的眼球与腮红', () => {
+  for (const c of CREATURES) {
+    const o = mount({ creature: c })
+    assert.ok(o.el.classList.contains(`ao-creature-${c}`), `缺少 ao-creature-${c}`)
+    assert.ok(o.el.querySelector('.ao-body'))
+    assert.ok(o.el.querySelector('.ao-blush'))
+    assert.ok(o.el.querySelector('.ao-eye-round .ao-eyeball'), `${c} 缺少眼球`)
+    o.destroy()
+  }
+})
+
+test('creature：嘴型跟情绪走，出错时固定为波浪嘴', () => {
+  const o = mount({ creature: 'cat' })
+  assert.equal(o.el.getAttribute('data-mouth'), 'w')
+  o.mood = 'happy'
+  assert.equal(o.el.getAttribute('data-mouth'), 'open')
+  o.mood = 'neutral'
+  o.state = 'working'
+  assert.equal(o.el.getAttribute('data-mouth'), 'flat')
+  o.state = 'error'
+  assert.equal(o.el.getAttribute('data-mouth'), 'wave')
+  o.destroy()
+})
+
+test('有喙的物种不画嘴', () => {
+  const o = mount({ creature: 'owl' })
+  assert.ok(o.el.classList.contains('ao-has-beak'))
+  o.destroy()
+})
+
+test('poke 喷出粒子，飘完自动清理；传 null 不换表情', async () => {
+  const o = mount({ creature: 'bunny', mood: 'curious' })
+  o.poke(null)
+  assert.equal(o.mood, 'curious')
+  assert.ok(o.el.querySelectorAll('.ao-particle').length > 0)
+  await new Promise((r) => setTimeout(r, 1500))
+  assert.equal(o.el.querySelectorAll('.ao-particle').length, 0)
+  o.destroy()
+})

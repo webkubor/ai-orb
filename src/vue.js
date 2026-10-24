@@ -2,7 +2,7 @@
  * ai-orb 3.0 Vue 3 组件封装
  */
 import { defineComponent, h, onBeforeUnmount, onMounted, ref, watch } from 'vue'
-import { AgentOrb as Core, STATES, SHAPES, MOODS, MOTIONS } from './index.js'
+import { AgentOrb as Core, STATES, SHAPES, MOODS, MOTIONS, CREATURES } from './index.js'
 
 export const AgentOrb = defineComponent({
   name: 'AgentOrb',
@@ -23,6 +23,8 @@ export const AgentOrb = defineComponent({
     squish: { type: Boolean, default: true },
     /** 眨眼 */
     blink: { type: Boolean, default: true },
+    /** 生灵：cat/bunny/dragon/owl/sprout/axolotl/bear/chick，设置后优先于 shape，只在挂载时读取 */
+    creature: { type: String, default: undefined, validator: (v) => !v || CREATURES.includes(v) },
     /** 几何形态：circle/squircle/pill/diamond/hex/shield/drop/bean/star */
     shape: { type: String, default: undefined, validator: (v) => !v || SHAPES.includes(v) },
     /** 内置主题名 */
@@ -30,7 +32,7 @@ export const AgentOrb = defineComponent({
     /** 覆盖无障碍文案 */
     labels: { type: Object, default: undefined },
   },
-  emits: ['click'],
+  emits: ['click', 'pet'],
   setup(props, { emit, expose }) {
     const host = ref(null)
     let orb = null
@@ -46,9 +48,11 @@ export const AgentOrb = defineComponent({
         squish: props.squish,
         blink: props.blink,
         shape: props.shape,
+        creature: props.creature,
         theme: props.theme,
         labels: props.labels,
         onClick: (e) => emit('click', e),
+        onPet: () => emit('pet'),
       })
     })
 
@@ -70,5 +74,5 @@ export const AgentOrb = defineComponent({
   },
 })
 
-export { STATES, SHAPES, MOODS, MOTIONS, DEFAULT_LABELS, THEMES, css, injectStyle } from './index.js'
+export { STATES, SHAPES, MOODS, MOTIONS, CREATURES, DEFAULT_LABELS, THEMES, css, injectStyle } from './index.js'
 export default AgentOrb
