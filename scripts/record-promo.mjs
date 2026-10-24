@@ -73,10 +73,13 @@ execFileSync('ffmpeg', ['-y', '-loglevel', 'error', '-f', 'concat', '-safe', '0'
   '-vf', 'fps=30,scale=1920:1080:flags=lanczos:in_range=pc:out_range=tv,format=yuv420p', '-color_range', 'tv',
   '-c:v', 'libx264', '-profile:v', 'high', '-preset', 'slow', '-crf', '18', '-movflags', '+faststart', mp4])
 
-// GIF 只截「跟随 + 戳 + 摸摸」那段，960 宽 15fps，控制在 Twitter 的 15 MB 以内
+// GIF 给 README 用，只截「跟随 + 戳 + 摸摸」那段。
+// 必须压在 5 MB 以内：GitHub 用 camo 代理 README 外链图片，超过上限直接 404，README 里就是一张裂图
 const gif = join(OUT, 'ai-orb-3.gif')
-execFileSync('ffmpeg', ['-y', '-loglevel', 'error', '-ss', '4.6', '-t', '12', '-i', mp4,
-  '-vf', 'fps=15,scale=960:-1:flags=lanczos,split[a][b];[a]palettegen=max_colors=192:stats_mode=diff[p];[b][p]paletteuse=dither=sierra2_4a',
+execFileSync('ffmpeg', ['-y', '-loglevel', 'error', '-ss', '4.6', '-t', '11', '-i', mp4,
+  '-vf', 'fps=12,scale=720:-1:flags=lanczos,split[a][b];[a]palettegen=max_colors=128:stats_mode=diff[p];[b][p]paletteuse=dither=sierra2_4a:diff_mode=rectangle',
   gif])
+const gifMB = (await import('node:fs')).statSync(gif).size / 1e6
+if (gifMB > 4.8) throw new Error(`GIF ${gifMB.toFixed(1)} MB，超过 GitHub camo 上限，README 会裂图`)
 
 console.log(`✓ ${mp4}\n✓ ${gif}`)

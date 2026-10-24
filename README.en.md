@@ -25,7 +25,7 @@
 ## 3.0 · Creatures
 
 <p align="center">
-  <a href="https://webkubor.github.io/ai-orb/"><img src="https://webkubor.github.io/ai-orb/media/ai-orb-3.gif" width="720" alt="ai-orb 3.0 creatures: eight species that watch your cursor, bounce when poked and blush when petted"></a>
+  <a href="https://webkubor.github.io/ai-orb/"><img src="https://webkubor.github.io/ai-orb/media/ai-orb-3.gif?v=3.0.1" width="720" alt="ai-orb 3.0 creatures: eight species that watch your cursor, bounce when poked and blush when petted"></a>
 </p>
 <p align="center"><sub>8 species · 8 moods · eyes follow your cursor · bounce when poked · hearts when petted — <a href="https://webkubor.github.io/ai-orb/media/ai-orb-3.mp4">1080p video</a> · <a href="https://webkubor.github.io/ai-orb/">live demo</a><br>Creatures are an opt-in plugin. The classic orbs and all six states are still here, see below.</sub></p>
 
