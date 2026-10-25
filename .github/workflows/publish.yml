@@ -26,14 +26,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # Trusted Publisher 要求 npm >= 11.5.1（OIDC 支持）
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
           registry-url: 'https://registry.npmjs.org'
-
-      # Trusted Publisher 要求 npm >= 11.5.1
-      - name: 升级 npm 确保支持 OIDC
-        run: npm install -g npm@latest
 
       - name: 确认 npm 版本支持 OIDC
         run: |
@@ -69,14 +66,6 @@ jobs:
           if npm view "$NAME@$VERSION" version >/dev/null 2>&1; then
             echo "::error::$NAME@$VERSION 已存在于 npm，先升 package.json 的 version"; exit 1
           fi
-
-      # setup-node 会写一行 `_authToken=${NODE_AUTH_TOKEN}`；没有 token 时展开成空凭据，
-      # 会让 OIDC 路径走不通，所以删掉它
-      - name: 移除空认证行
-        run: |
-          sed -i -E '/:_authToken=/d' "$NPM_CONFIG_USERCONFIG" 2>/dev/null || true
-          [ -f "$HOME/.npmrc" ] && sed -i -E '/:_authToken=/d' "$HOME/.npmrc" || true
-          [ -f .npmrc ] && sed -i -E '/:_authToken=/d' .npmrc || true
 
       - name: 发布到 npm
         run: npm publish --access public --provenance
