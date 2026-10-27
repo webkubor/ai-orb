@@ -32,7 +32,7 @@
 ## See it once, you get it
 
 <p align="center">
-  <img src="./demo/showcase.png" width="720" alt="ai-orb: six states, three shapes, eight themes">
+  <img src="https://cdn.jsdelivr.net/gh/webkubor/free-imgbed@main/ai-orb/showcase.webp" width="720" alt="ai-orb: six states, three shapes, eight themes">
 </p>
 
 | State | When | What it does |

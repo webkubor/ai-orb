@@ -33,7 +33,7 @@
 ## 看一眼就知道它在干嘛
 
 <p align="center">
-  <img src="./demo/preview.png" width="680" alt="ai-orb 六个状态预览">
+  <img src="https://cdn.jsdelivr.net/gh/webkubor/free-imgbed@main/ai-orb/preview.webp" width="680" alt="ai-orb 六个状态预览">
 </p>
 
 | 状态 | 什么时候亮 | 表现 |
