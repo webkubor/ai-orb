@@ -67,7 +67,8 @@
   },
   "scripts": {
     "test": "node --test test/*.test.js",
-    "demo": "node -e \"console.log('打开 demo/index.html 即可，零构建。')\""
+    "demo": "node -e \"console.log('打开 demo/index.html 即可，零构建。')\"",
+    "prepublishOnly": "node scripts/prepublish-gate.mjs && node scripts/readme-gate.mjs && node scripts/version-sync-gate.mjs"
   },
   "engines": {
     "node": ">=18"
