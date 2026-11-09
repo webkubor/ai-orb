@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1280">
+<title>ai-orb 4.0 · Crystal promo</title>
+<!--
+  Crystal 形态推广短片的「拍摄现场」：1280×720，打开自动播一遍（约 26 秒），?once 结束后停。
+  与 3.0 promo 同一套路：假光标派发真实 mousemove，视差折射是库本身的行为。
+  录制：node scripts/record-crystal-promo.mjs → demo/media/ai-orb-4.mp4 / ai-orb-4-crystal.gif
+-->
+<style>
+  * { box-sizing: border-box; margin: 0; }
+  html, body { width: 1280px; height: 720px; overflow: hidden; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Segoe UI", sans-serif;
+    color: #e9eef6; cursor: none;
+    background: linear-gradient(165deg, #10141c 0%, #0a0d13 55%, #07090d 100%);
+  }
+  .stage { position: relative; width: 1280px; height: 720px; overflow: hidden;
+    background:
+      radial-gradient(1000px 520px at 20% -10%, rgba(93, 133, 180, .14), transparent 60%),
+      radial-gradient(880px 480px at 86% 112%, rgba(146, 116, 186, .12), transparent 62%),
+      linear-gradient(165deg, #10141c 0%, #0a0d13 55%, #07090d 100%);
+  }
+  .grain { position: absolute; inset: 0; pointer-events: none; opacity: .045; mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  .title { position: absolute; top: 58px; left: 0; right: 0; text-align: center;
+    transition: opacity .6s ease, transform .6s ease; }
+  .title h1 { font-size: 60px; font-weight: 800; letter-spacing: -.02em; }
+  .title h1 span {
+    background: linear-gradient(118deg, #e8f1fb 0%, #9fc4e8 40%, #c9b3ea 78%, #f2d9b8 100%);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .title p { margin-top: 12px; font-size: 20px; color: #97a3b6; }
+  .title p small { display: block; margin-top: 8px; font-size: 14px; color: #64708a; letter-spacing: .12em; }
+
+  .caption { position: absolute; left: 0; right: 0; bottom: 72px; text-align: center;
+    opacity: 0; transform: translateY(10px); transition: opacity .45s ease, transform .45s ease; }
+  .caption.on { opacity: 1; transform: none; }
+  .caption b { display: inline-block; font-size: 36px; font-weight: 700; letter-spacing: -.01em; }
+  .caption small { display: block; margin-top: 10px; font-size: 18px; color: #7c879c; letter-spacing: .1em; }
+
+  /* 单颗主角球 */
+  .hero { position: absolute; left: 50%; top: 300px; transform: translate(-50%, -50%) scale(.6); opacity: 0;
+    transition: opacity .7s ease, transform .7s cubic-bezier(.22, 1, .36, 1); }
+  .hero.on { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+
+  /* 六态排 */
+  .row { position: absolute; left: 0; right: 0; top: 226px; display: flex; justify-content: center; gap: 8px;
+    transition: opacity .6s ease, transform .6s ease; }
+  .row.hide { opacity: 0; transform: translateY(-16px); pointer-events: none; }
+  .slot { width: 152px; display: flex; flex-direction: column; align-items: center; gap: 16px;
+    opacity: 0; transform: translateY(26px); transition: opacity .55s ease, transform .55s ease; }
+  .slot.in { opacity: 1; transform: none; }
+  .slot small { font-size: 15px; color: #8d99ad; letter-spacing: .08em; }
+
+  /* 片尾 */
+  .end { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 26px;
+    opacity: 0; transition: opacity .8s ease; pointer-events: none; }
+  .end.on { opacity: 1; }
+  .end .mini { display: flex; gap: 18px; }
+  .end b { font-size: 30px; font-weight: 700; color: #dfe7f2; }
+  .end small { font-size: 15px; color: #6d7890; letter-spacing: .1em; }
+
+  /* 假光标 */
+  .cursor { position: absolute; left: 0; top: 0; width: 26px; height: 26px; pointer-events: none; opacity: 0;
+    transition: opacity .3s; z-index: 9; }
+  .cursor.on { opacity: 1; }
+  .cursor svg { filter: drop-shadow(0 3px 7px rgba(0, 0, 0, .5)); }
+  .cursor.press svg { transform: scale(.85); }
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="grain"></div>
+  <div class="title" id="title">
+    <h1><span>ai-orb 4.0 · Crystal</span></h1>
+    <p>The next form has no face<small>无脸 · 玻璃 · 丝绸 —— 靠流动表态</small></p>
+  </div>
+
+  <div class="hero" id="hero"></div>
+
+  <div class="caption"><b id="capEn"></b><small id="capZh"></small></div>
+
+  <div class="row" id="row"></div>
+
+  <div class="end" id="end">
+    <div class="mini" id="mini"></div>
+    <b>ai-orb 4.0 · Crystal skin</b>
+    <small>npm i ai-orb &nbsp;·&nbsp; import 'ai-orb/crystal'</small>
+  </div>
+
+  <div class="cursor" id="cursor">
+    <svg width="26" height="26" viewBox="0 0 24 24" fill="none"><path d="M5 3l14 7.6-6.2 1.4L9.5 18 5 3z" fill="#e9eef6" stroke="#0a0d13" stroke-width="1.4"/></svg>
+  </div>
+</div>
+
+<script type="module">
+import { AgentOrb } from '../src/index.js'
+import '../src/crystal.js'
+
+const $ = (id) => document.getElementById(id)
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms))
+
+/* ── 假光标 ─────────────────────────────────────────────── */
+const cursor = { el: $('cursor'), x: 640, y: 900 }
+function placeCursor(x, y) {
+  cursor.x = x; cursor.y = y
+  cursor.el.style.transform = `translate(${x - 3}px, ${y - 2}px)`
+  window.dispatchEvent(new MouseEvent('mousemove', { clientX: x, clientY: y }))
+}
+const ease = (t) => 1 - Math.pow(1 - t, 3)
+function moveTo(x, y, ms, onStep) {
+  const [sx, sy] = [cursor.x, cursor.y]
+  const t0 = performance.now()
+  return new Promise((resolve) => {
+    const tick = (now) => {
+      const t = Math.min(1, (now - t0) / ms)
+      const e = ease(t)
+      const px = cursor.x, py = cursor.y
+      placeCursor(sx + (x - sx) * e, sy + (y - sy) * e)
+      onStep?.(cursor.x - px, cursor.y - py)
+      t < 1 ? requestAnimationFrame(tick) : resolve()
+    }
+    requestAnimationFrame(tick)
+  })
+}
+function centerOf(el) {
+  const b = el.getBoundingClientRect()
+  return [b.left + b.width / 2, b.top + b.height / 2]
+}
+function caption(en, zh) {
+  const c = document.querySelector('.caption')
+  c.classList.remove('on')
+  return sleep(260).then(() => {
+    c.querySelector('b').textContent = en
+    c.querySelector('small').textContent = zh
+    if (en) c.classList.add('on')
+  })
+}
+
+/* ── 演员 ──────────────────────────────────────────────── */
+let hero = null
+let rowOrbs = []
+let miniOrbs = []
+
+function makeHero(state) {
+  hero?.destroy()
+  $('hero').innerHTML = ''
+  hero = new AgentOrb($('hero'), { state, skin: 'crystal', size: 210 })
+}
+function reset() {
+  hero?.destroy(); hero = null
+  for (const o of [...rowOrbs, ...miniOrbs]) o.destroy()
+  rowOrbs = []; miniOrbs = []
+  $('row').innerHTML = ''; $('mini').innerHTML = ''
+  $('row').classList.remove('hide'); $('hero').classList.remove('on'); $('end').classList.remove('on')
+  $('title').style.opacity = '1'; $('title').style.transform = 'none'
+  document.querySelector('.caption').classList.remove('on')
+  cursor.el.classList.remove('on')
+  placeCursor(640, 900)
+}
+const SHOW = [
+  ['idle', '待命', '安静的珍珠白'], ['thinking', '在想', '波纹变密'],
+  ['working', '干活中', '流转加快'], ['asking', '等你回话', '收拢泛紫'],
+  ['done', '好了', '染上暖金'], ['error', '出错了', '褪成灰'],
+]
+
+async function play() {
+  reset()
+  await sleep(500)
+
+  // 1. 主角登场：idle 珍珠
+  makeHero('idle')
+  $('hero').classList.add('on')
+  await sleep(1600)
+
+  // 2. 视差折射：光标绕着球划，高光在玻璃里偏移
+  await caption('The glass notices you', '光标划过 · 高光在玻璃内折射偏移')
+  cursor.el.classList.add('on')
+  const [hx, hy] = centerOf(hero.el)
+  for (const [x, y, ms] of [[hx - 190, hy - 130, 900], [hx + 190, hy - 120, 1500], [hx + 150, hy + 150, 900], [hx - 160, hy + 140, 1100]]) {
+    await moveTo(x, y, ms)
+  }
+
+  // 3. 状态一个个变：同一颗球，六种情绪
+  await caption('Six states, one silk', '同一匹绸 · 六种表态')
+  cursor.el.classList.remove('on')
+  for (const [state] of SHOW.slice(1)) {
+    hero.set(state)
+    await sleep(1250)
+  }
+
+  // 4. 六态排开
+  await caption('All six, side by side', '六态同排 · 每颗球的绸都不重样')
+  $('hero').classList.remove('on')
+  $('title').style.opacity = '0'
+  $('title').style.transform = 'translateY(-14px)'
+  for (const [state, name] of SHOW) {
+    const slot = document.createElement('div')
+    slot.className = 'slot'
+    const host = document.createElement('div')
+    const label = document.createElement('small'); label.textContent = name
+    slot.append(host, label)
+    $('row').append(slot)
+    rowOrbs.push(new AgentOrb(host, { state, skin: 'crystal', size: 132 }))
+    slot.classList.add('in')
+    await sleep(150)
+  }
+  await sleep(3200)
+
+  // 5. 片尾
+  await caption('', '')
+  $('row').classList.add('hide')
+  await sleep(500)
+  for (const [state] of SHOW) {
+    const host = document.createElement('div')
+    $('mini').append(host)
+    miniOrbs.push(new AgentOrb(host, { state, skin: 'crystal', size: 56 }))
+  }
+  $('end').classList.add('on')
+  placeCursor(640, 520)
+  await sleep(3600)
+
+  if (!new URLSearchParams(location.search).has('once')) play()
+  else document.body.dataset.done = '1'
+}
+play()
+</script>
+</body>
+</html>

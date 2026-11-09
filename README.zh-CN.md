@@ -4,7 +4,7 @@
 
 <p align="center">
   <strong>一颗会表态的 AI 助手状态球。</strong><br>
-  在想 · 干活中 · 等你回话 · 好了。零依赖，核心约 7 KB（gzip），生灵插件按需加载。
+  在想 · 干活中 · 等你回话 · 好了。零依赖，核心约 7 KB（gzip），生灵与 Crystal 皮肤按需加载。
 </p>
 
 <p align="center">
@@ -22,6 +22,14 @@
 </p>
 
 ---
+
+## 4.0 · Crystal 形态
+
+<p align="center">
+  <a href="https://webkubor.github.io/ai-orb/"><img src="https://webkubor.github.io/ai-orb/media/ai-orb-4-crystal.gif?v=4.0.0" width="720" alt="ai-orb 4.0 Crystal 形态：白玉玻璃球内裹着流动的丝绸，六态靠波纹与色相表态"></a>
+</p>
+<p align="center"><sub>无脸 · 玻璃 · 丝绸 —— 不靠五官，靠流动表态。<a href="https://webkubor.github.io/ai-orb/media/ai-orb-4.mp4">1080p 视频</a> · <a href="https://webkubor.github.io/ai-orb/">在线试玩</a><br>
+Crystal 是可选皮肤（gzip 约 3 KB），不加载时核心包一切照旧。</sub></p>
 
 ## 3.0 · 生灵形态
 
@@ -59,6 +67,30 @@ new AgentOrb(el, { creature: 'cat', theme: 'violet', mood: 'curious', motion: 'b
 可选物种：`cat` `bunny` `dragon` `owl` `sprout` `axolotl` `bear` `chick`。
 表情 `mood`：`neutral` `happy` `curious` `focused` `playful` `sparkle` `zen` `surprised`，嘴型跟着变。
 交互：光标靠近会竖耳；鼠标停下它会东张西望；`orb.poke()` 果冻回弹冒星光；在它身上来回划动就是「摸摸」，冒爱心并触发 `onPet`（Vue 里是 `@pet`）。
+
+## Crystal 皮肤（4.0）
+
+下一个形态不再有脸。白玉玻璃壳里裹着一匹会流动的丝绸——噪声高度场 + 漫反射光照织出来的真绸缎，
+不是几块渐变色斑。表情全部收进流动里：
+
+| 状态 | 绸的表现 |
+|---|---|
+| `idle` | 几乎不动，安静的珍珠白 |
+| `thinking` | 波纹变密，冷蓝 |
+| `working` | 流转加快，绸在玻璃里打转 |
+| `asking` | 绸轻轻收拢，泛紫，像在举手 |
+| `done` | 染上暖金，波纹舒展 |
+| `error` | 褪成灰，流动减慢 |
+
+```js
+import { AgentOrb } from 'ai-orb'
+import 'ai-orb/crystal'
+
+new AgentOrb(el, { skin: 'crystal', state: 'thinking' })
+```
+
+细节：丝绸纹理每颗球独立 seed，同页多颗纹理会有变化；光标划过时高光在玻璃内偏移（视差折射）；
+`prefers-reduced-motion` 下波纹静止。色相、流速、褶皱都可调（`--cx-*` 变量）。
 
 ## 八色主题
 
@@ -138,16 +170,19 @@ API 就这些。
 | `state` | `OrbState` | `'idle'` | 未知值回落到 `idle` |
 | `unseen` | `number` | `0` | 仅 `state === 'done'` 且 `> 0` 时显示角标 |
 | `size` | `number \| string` | — | 数字按 px 处理 |
-| `follow` | `boolean` | `true` | 眼睛跟随光标 |
-| `blink` | `boolean` | `true` | 眨眼 |
+| `follow` | `boolean` | `true` | 眼睛 / 高光跟随光标 |
+| `blink` | `boolean` | `true` | 眨眼（生灵 / 经典形态） |
+| `shape` | `string` | `'circle'` | 外形：`circle` / `squircle` / `pill` 等 9 种 |
+| `creature` | `string` | — | 生灵物种，需 `import 'ai-orb/creatures'`，优先于 `shape` |
+| `skin` | `string` | — | 皮肤名（`crystal`），需 `import 'ai-orb/crystal'`，优先于 `creature` |
 | `theme` | `string \| null` | `null` | 内置主题名（见上表） |
 | `labels` | `object` | 英文 | 覆盖 `aria-label` 文案，做多语言用 |
 | `onClick` | `function` | — | 点击回调 |
 
-**实例：** `orb.state`、`orb.unseen`、`orb.theme`（都可写）、`orb.set(state, unseen?)`、
-`orb.destroy()`、`orb.el`（那个 button，用它设 CSS 变量）。
+**实例：** `orb.state`、`orb.unseen`、`orb.theme`（都可写）、`orb.shape` / `orb.creature` / `orb.skin`（只读）、
+`orb.set(state, unseen?)`、`orb.destroy()`、`orb.el`（那个 button，用它设 CSS 变量）。
 
-**另外导出：** `STATES`、`DEFAULT_LABELS`、`THEMES`、`css`、`injectStyle(doc?)`。
+**另外导出：** `STATES`、`DEFAULT_LABELS`、`THEMES`、`CREATURES`、`SKINS`、`css`、`injectStyle(doc?)`。
 
 样式每页自动注入一次。要自己管样式（SSR、严格 CSP、自定义主题流水线）就
 改成引入 `css` 字符串。
@@ -168,7 +203,7 @@ API 就这些。
 ## 本地开发
 
 ```bash
-git clone https://github.com/webkubor/ai-orb
+git clone git@github.com:webkubor/ai-orb
 cd ai-orb
 npm install
 npm test

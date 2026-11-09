@@ -1,5 +1,5 @@
 import type { DefineComponent } from 'vue'
-import type { OrbState, ThemeName, ShapeName, MoodName, MotionMode, CreatureName, AgentOrb as Core } from './index.js'
+import type { OrbState, ThemeName, ShapeName, MoodName, MotionMode, CreatureName, SkinName, AgentOrb as Core } from './index.js'
 
 export interface AgentOrbProps {
   state?: OrbState
@@ -12,6 +12,7 @@ export interface AgentOrbProps {
   blink?: boolean
   shape?: ShapeName
   creature?: CreatureName
+  skin?: SkinName
   theme?: ThemeName | null
   labels?: Partial<Record<OrbState, string>>
 }
@@ -30,6 +31,6 @@ export declare const AgentOrb: DefineComponent<
   { click: (e: MouseEvent) => void; pet: () => void }
 >
 
-export { STATES, SHAPES, MOODS, MOTIONS, CREATURES, DEFAULT_LABELS, THEMES, css, injectStyle } from './index.js'
-export type { OrbState, ThemeName, ShapeName, MoodName, MotionMode, CreatureName, AgentOrbOptions } from './index.js'
+export { STATES, SHAPES, MOODS, MOTIONS, CREATURES, SKINS, DEFAULT_LABELS, THEMES, css, injectStyle } from './index.js'
+export type { OrbState, ThemeName, ShapeName, MoodName, MotionMode, CreatureName, SkinName, AgentOrbOptions } from './index.js'
 export default AgentOrb

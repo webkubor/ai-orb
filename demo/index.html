@@ -142,6 +142,7 @@ orb.poke()               // 戳一下：果冻回弹 + 星光
         <fieldset><legend>当前状态</legend><div class="btns" id="picks"></div></fieldset>
         <fieldset><legend>主题颜色</legend><div class="btns" id="themePicks"></div></fieldset>
         <fieldset><legend>外形</legend><div class="btns" id="shapePicks"></div></fieldset>
+        <fieldset><legend>皮肤</legend><div class="btns" id="skinPicks"></div></fieldset>
       </div>
     </div>
   </section>
@@ -168,8 +169,21 @@ orb.destroy()            // 卸载时记得清理</pre>
     <div class="theme-row" id="themes"></div>
   </section>
 
+  <section class="v3">
+    <h2>4.0 新形态：Crystal<span class="classic-mark">无脸 · 玻璃 · 丝绸</span></h2>
+    <p class="v3-intro" id="crystalIntro">下一个形态不再靠五官：白玉玻璃壳里裹着一匹会流动的绸，
+      在想时波纹变密、干活时流转加快、好了时染上暖金、出错时褪成灰。
+      表情没了，但情绪全在。</p>
+    <div class="zoo" id="crystalRow"></div>
+    <p class="zoo-hint">Crystal 是可选皮肤，不加载时核心包不变：<code>import 'ai-orb/crystal'</code></p>
+    <pre style="margin-top:14px">import { AgentOrb } from 'ai-orb'
+import 'ai-orb/crystal'
+
+new AgentOrb(el, { skin: 'crystal', state: 'thinking' })</pre>
+  </section>
+
   <section>
-    <h2>换形态：shape 选项<span class="classic-mark">3 种经典 + 6 种 3.0 新增</span></h2>
+    <h2>全部形态<span class="classic-mark">几何 9 种 · 生灵 8 种 · 皮肤 1 种</span></h2>
     <div class="theme-row" id="shapes"></div>
   </section>
 
@@ -181,6 +195,26 @@ orb.destroy()            // 卸载时记得清理</pre>
 <script type="module">
 import { AgentOrb, THEMES, SHAPES, MOODS } from '../src/index.js'
 import '../src/creatures.js'
+import '../src/crystal.js'
+
+// 4.0 Crystal：六态各一颗，无脸，靠波纹与色相表态
+const CRYSTAL_SHOW = [
+  ['idle', '待命', '绸几乎不动，安静在场'], ['thinking', '在想', '波纹变密，像在翻找思路'],
+  ['working', '干活中', '流转加快，绸在齿轮里转'], ['asking', '等你回话', '绸轻轻收拢，像在举手'],
+  ['done', '好了', '染上暖金，波纹舒展'], ['error', '出错了', '褪成灰，流动减慢'],
+]
+const crystalRow = document.getElementById('crystalRow')
+const crystalOrbs = []
+for (const [state, name, desc] of CRYSTAL_SHOW) {
+  const cell = document.createElement('div')
+  cell.className = 'cell'
+  const slot = document.createElement('div')
+  const b = document.createElement('b'); b.textContent = name
+  const s = document.createElement('small'); s.textContent = desc
+  cell.append(slot, b, s)
+  crystalRow.append(cell)
+  crystalOrbs.push(new AgentOrb(slot, { state, skin: 'crystal', size: 84 }))
+}
 
 // 3.0 生灵：8 个物种，各配一个主题和律动
 const ZOO = [
@@ -286,13 +320,36 @@ for (const shape of SHAPES) {
   btn.onclick = () => {
     curShape = shape
     // 形态不能动态改，需要 destroy 重建
-    play.destroy()
-    const pg = document.getElementById('playground')
-    play = new AgentOrb(pg, { size: 112, shape, theme: curTheme, labels, onClick: toggleDemo })
-    if (curState !== 'idle') play.set(curState, curState === 'done' ? 5 : 0)
+    rebuildPlay()
     shapePicks.querySelectorAll('.pick').forEach((x) => markSelected(x, x === btn))
   }
   shapePicks.append(btn)
+}
+
+// 皮肤选择器：换整张皮，同样需要重建
+const SKIN_NAMES = { none: '经典', crystal: 'Crystal 4.0' }
+const skinPicks = document.getElementById('skinPicks')
+let curSkin = 'none'
+function rebuildPlay() {
+  play.destroy()
+  const pg = document.getElementById('playground')
+  play = new AgentOrb(pg, {
+    size: 112, shape: curShape, theme: curTheme, labels, onClick: toggleDemo,
+    ...(curSkin !== 'none' ? { skin: curSkin } : {}),
+  })
+  if (curState !== 'idle') play.set(curState, curState === 'done' ? 5 : 0)
+}
+for (const key of ['none', 'crystal']) {
+  const btn = document.createElement('button')
+  btn.className = 'pick' + (key === 'none' ? ' on' : '')
+  btn.setAttribute('aria-pressed', String(key === 'none'))
+  btn.textContent = SKIN_NAMES[key]
+  btn.onclick = () => {
+    curSkin = key
+    rebuildPlay()
+    skinPicks.querySelectorAll('.pick').forEach((x) => markSelected(x, x === btn))
+  }
+  skinPicks.append(btn)
 }
 
 const runButton = document.getElementById('runDemo')

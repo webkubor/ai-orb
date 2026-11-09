@@ -4,7 +4,7 @@
 
 <p align="center">
   <strong>A tiny orb that shows what your AI assistant is doing.</strong><br>
-  Thinking · working · waiting on you · done. Zero deps, ~7 KB gzipped core, creatures are an opt-in plugin.
+  Thinking · working · waiting on you · done. Zero deps, ~7 KB gzipped core, creatures and the Crystal skin are opt-in plugins.
 </p>
 
 <p align="center">
@@ -21,6 +21,14 @@
 </p>
 
 ---
+
+## 4.0 · Crystal skin
+
+<p align="center">
+  <a href="https://webkubor.github.io/ai-orb/"><img src="https://webkubor.github.io/ai-orb/media/ai-orb-4-crystal.gif?v=4.0.0" width="720" alt="ai-orb 4.0 Crystal skin: a white-jade glass orb wrapped in flowing silk; six states expressed through ripples and hue"></a>
+</p>
+<p align="center"><sub>No face · glass · silk — it speaks through motion, not features. <a href="https://webkubor.github.io/ai-orb/media/ai-orb-4.mp4">1080p video</a> · <a href="https://webkubor.github.io/ai-orb/">live demo</a><br>
+Crystal is an opt-in skin (~3 KB gzipped); without it the core is unchanged.</sub></p>
 
 ## 3.0 · Creatures
 
@@ -69,6 +77,32 @@ new AgentOrb(el, { creature: 'cat', theme: 'violet', mood: 'curious', motion: 'b
 Species: `cat` `bunny` `dragon` `owl` `sprout` `axolotl` `bear` `chick`.
 Moods: `neutral` `happy` `curious` `focused` `playful` `sparkle` `zen` `surprised` — the mouth changes with them.
 Interaction: ears perk up when the cursor comes close; it looks around on its own when you stop moving; `orb.poke()` squashes and sparkles; stroking back and forth over it is a pet — hearts, plus an `onPet` callback (`@pet` in Vue).
+
+## Crystal skin (4.0)
+
+The next form has no face at all. A white-jade glass shell wraps a flowing sheet of silk —
+real fabric woven from a noise height field plus diffuse lighting, not a few gradient blobs.
+Every emotion lives in the motion:
+
+| State | Silk behaviour |
+|---|---|
+| `idle` | Barely moves — a quiet pearl |
+| `thinking` | Ripples tighten, cool blue |
+| `working` | Flow speeds up, silk turns inside the glass |
+| `asking` | Silk gathers softly, violet — a raised hand |
+| `done` | Warms to gold, ripples relax |
+| `error` | Fades to grey, the flow slows |
+
+```js
+import { AgentOrb } from 'ai-orb'
+import 'ai-orb/crystal'
+
+new AgentOrb(el, { skin: 'crystal', state: 'thinking' })
+```
+
+Details: each orb gets its own turbulence seed, so multiple orbs can have different textures;
+highlights parallax inside the glass as your cursor moves; ripples freeze under
+`prefers-reduced-motion`. Hue, flow and ripple strength are all tunable via the `--cx-*` variables.
 
 ## Eight themes
 
@@ -127,17 +161,19 @@ That's the whole API.
 | `state` | `OrbState` | `'idle'` | Unknown values fall back to `idle` |
 | `unseen` | `number` | `0` | Badge shows when `state === 'done'` and `> 0` |
 | `size` | `number \| string` | — | Numbers treated as px |
-| `follow` | `boolean` | `true` | Eyes track cursor |
-| `blink` | `boolean` | `true` | Blinking |
-| `shape` | `string` | `'circle'` | Shape: `circle` / `squircle` / `pill` |
+| `follow` | `boolean` | `true` | Eyes / highlights track cursor |
+| `blink` | `boolean` | `true` | Blinking (creatures / classic) |
+| `shape` | `string` | `'circle'` | Shape: `circle` / `squircle` / `pill` and 6 more |
+| `creature` | `string` | — | Species, requires `import 'ai-orb/creatures'`; takes priority over `shape` |
+| `skin` | `string` | — | Skin name (`crystal`), requires `import 'ai-orb/crystal'`; takes priority over `creature` |
 | `theme` | `string \| null` | `null` | Built-in theme name (see above) |
 | `labels` | `object` | English | Override `aria-label` for i18n |
 | `onClick` | `function` | — | Click handler |
 
-**Instance:** `orb.state`, `orb.unseen`, `orb.theme` (settable), `orb.shape` (readonly),
+**Instance:** `orb.state`, `orb.unseen`, `orb.theme` (settable), `orb.shape` / `orb.creature` / `orb.skin` (readonly),
 `orb.set(state, unseen?)`, `orb.destroy()`, `orb.el`.
 
-**Also exported:** `STATES`, `DEFAULT_LABELS`, `SHAPES`, `THEMES`, `css`, `injectStyle(doc?)`.
+**Also exported:** `STATES`, `DEFAULT_LABELS`, `SHAPES`, `THEMES`, `CREATURES`, `SKINS`, `css`, `injectStyle(doc?)`.
 
 ## 🎨 Theming
 
@@ -171,7 +207,7 @@ Themes are CSS variables under the hood. Override on the element for fine-graine
 ## Local dev
 
 ```bash
-git clone https://github.com/webkubor/ai-orb
+git clone git@github.com:webkubor/ai-orb
 cd ai-orb
 npm install
 npm test

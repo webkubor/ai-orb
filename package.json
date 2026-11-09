@@ -1,6 +1,6 @@
 {
   "name": "ai-orb",
-  "version": "3.0.1",
+  "version": "4.0.0",
   "description": "A tiny SVG orb that shows what your AI assistant is doing — thinking, working, waiting on you, done. Zero dependencies.",
   "keywords": [
     "ai",
@@ -12,6 +12,9 @@
     "status",
     "indicator",
     "vue",
+    "crystal",
+    "silk",
+    "glassmorphism",
     "zero-dependency"
   ],
   "license": "MIT",
@@ -26,7 +29,8 @@
   },
   "type": "module",
   "sideEffects": [
-    "./src/creatures.js"
+    "./src/creatures.js",
+    "./src/crystal.js"
   ],
   "exports": {
     ".": {
@@ -41,6 +45,10 @@
     "./creatures": {
       "types": "./types/creatures.d.ts",
       "default": "./src/creatures.js"
+    },
+    "./crystal": {
+      "types": "./types/crystal.d.ts",
+      "default": "./src/crystal.js"
     },
     "./widget": {
       "types": "./types/widget.d.ts",

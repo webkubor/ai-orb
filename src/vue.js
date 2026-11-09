@@ -25,6 +25,8 @@ export const AgentOrb = defineComponent({
     blink: { type: Boolean, default: true },
     /** 生灵：cat/bunny/dragon/owl/sprout/axolotl/bear/chick，需先 import 'ai-orb/creatures'；只在挂载时读取 */
     creature: { type: String, default: undefined },
+    /** 皮肤：crystal（整张皮重画），需先 import 'ai-orb/crystal'；只在挂载时读取 */
+    skin: { type: String, default: undefined },
     /** 几何形态：circle/squircle/pill/diamond/hex/shield/drop/bean/star */
     shape: { type: String, default: undefined, validator: (v) => !v || SHAPES.includes(v) },
     /** 内置主题名 */
@@ -49,6 +51,7 @@ export const AgentOrb = defineComponent({
         blink: props.blink,
         shape: props.shape,
         creature: props.creature,
+        skin: props.skin,
         theme: props.theme,
         labels: props.labels,
         onClick: (e) => emit('click', e),
@@ -74,5 +77,5 @@ export const AgentOrb = defineComponent({
   },
 })
 
-export { STATES, SHAPES, MOODS, MOTIONS, CREATURES, DEFAULT_LABELS, THEMES, css, injectStyle } from './index.js'
+export { STATES, SHAPES, MOODS, MOTIONS, CREATURES, SKINS, DEFAULT_LABELS, THEMES, css, injectStyle } from './index.js'
 export default AgentOrb

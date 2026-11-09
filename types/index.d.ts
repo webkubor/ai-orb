@@ -4,6 +4,7 @@ export type ShapeName = 'circle' | 'squircle' | 'pill' | 'diamond' | 'hex' | 'sh
 export type MoodName = 'neutral' | 'happy' | 'curious' | 'focused' | 'playful' | 'sparkle' | 'zen' | 'surprised'
 export type MotionMode = 'breathe' | 'float' | 'bounce' | 'pulse' | 'orbit'
 export type CreatureName = 'cat' | 'bunny' | 'dragon' | 'owl' | 'sprout' | 'axolotl' | 'bear' | 'chick'
+export type SkinName = 'crystal'
 
 export declare const STATES: readonly OrbState[]
 export declare const SHAPES: readonly ShapeName[]
@@ -11,6 +12,8 @@ export declare const MOODS: readonly MoodName[]
 export declare const MOTIONS: readonly MotionMode[]
 /** 已注册的生灵；加载 ai-orb/creatures 前为空 */
 export declare const CREATURES: readonly CreatureName[]
+/** 已注册的皮肤；加载对应插件前为空 */
+export declare const SKINS: readonly SkinName[]
 export declare const DEFAULT_LABELS: Record<OrbState, string>
 export declare const THEMES: Record<ThemeName, Record<string, string>>
 
@@ -33,6 +36,8 @@ export interface AgentOrbOptions {
   blink?: boolean
   /** 生灵形态：有耳朵 / 角 / 鳃、大眼高光、腮红和嘴，设置后优先于 shape。只在创建时读取 */
   creature?: CreatureName
+  /** 皮肤形态：整张皮重画（如 crystal），优先于 creature 与 shape。只在创建时读取 */
+  skin?: SkinName
   /** 外形几何：circle / squircle / pill / diamond / hex / shield / drop / bean / star */
   shape?: ShapeName
   /** 内置主题名 */
@@ -61,6 +66,7 @@ export declare class AgentOrb {
   theme: ThemeName | null
   readonly shape: ShapeName
   readonly creature: CreatureName | null
+  readonly skin: SkinName | null
 
   /** 戳一下：果冻回弹 + 星光粒子；传 null 只弹不换表情 */
   poke(tempMood?: MoodName | null): this
@@ -72,5 +78,16 @@ export declare class AgentOrb {
 
 export declare const css: string
 export declare function injectStyle(doc?: Document, text?: string, key?: string): void
+
+/**
+ * 由皮肤插件调用，注册一套皮肤。
+ * 核心包不内置任何皮肤 —— 装了哪个插件才有什么皮肤。
+ */
+export declare function defineSkins(kit: {
+  names: readonly SkinName[]
+  svg: (name: SkinName, id: string) => string
+  css: string
+  styleKey?: string
+}): void
 
 export default AgentOrb

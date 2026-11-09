@@ -35,6 +35,30 @@ export function defineCreatures(kit) {
   for (const k of kit.kinds) if (!CREATURES.includes(k)) CREATURES.push(k)
 }
 
+/* ── 皮肤注册表 ──────────────────────────────────────────────────────────
+ * 皮肤是「换掉整张皮」的外形：不像生灵那样给球加零件，而是重画整个球体。
+ * 走独立插槽，核心包不为它付体积 —— 与生灵插件同一套路。
+ */
+
+/** 已注册的皮肤名；加载对应插件前为空 */
+export const SKINS = []
+const skinKits = new Map()
+
+/**
+ * 由皮肤插件（如 ai-orb/crystal）调用，注册一套皮肤。
+ * @param {object} kit
+ * @param {string[]} kit.names 皮肤名
+ * @param {(name: string, id: string) => string} kit.svg 返回内联 SVG
+ * @param {string} kit.css 皮肤样式
+ * @param {string} [kit.styleKey] 注入样式的 data 属性名，默认 data-agent-orb-skin
+ */
+export function defineSkins(kit) {
+  for (const n of kit.names) {
+    skinKits.set(n, kit)
+    if (!SKINS.includes(n)) SKINS.push(n)
+  }
+}
+
 /** 默认无障碍文案 */
 export const DEFAULT_LABELS = {
   idle: 'Assistant · idle',
@@ -112,6 +136,7 @@ export class AgentOrb {
    * @param {string} [opts.mood='neutral'] neutral/happy/curious/focused/playful/sparkle/zen/surprised
    * @param {string} [opts.motion] breathe/float/bounce/pulse/orbit
    * @param {string} [opts.creature] cat/bunny/dragon/owl/sprout/axolotl/bear/chick，设置后优先于 shape
+   * @param {string} [opts.skin] 皮肤名（整张皮重画），如 crystal；需先加载对应插件
    * @param {number} [opts.unseen=0]
    * @param {number|string} [opts.size] 尺寸，数字按 px
    * @param {boolean} [opts.follow=true] 眼睛与身体跟随鼠标
@@ -137,6 +162,7 @@ export class AgentOrb {
     this._mood = MOODS.includes(opts.mood) ? opts.mood : 'neutral'
     this._motion = MOTIONS.includes(opts.motion) ? opts.motion : null
     this._creature = CREATURES.includes(opts.creature) ? opts.creature : null
+    this._skin = SKINS.includes(opts.skin) ? opts.skin : null
     this._unseen = Number(opts.unseen) || 0
     this._follow = opts.follow !== false
     this._squishEnabled = opts.squish !== false
@@ -219,6 +245,7 @@ export class AgentOrb {
 
   get shape() { return this._shape }
   get creature() { return this._creature }
+  get skin() { return this._skin }
 
   /**
    * 戳一下：果冻挤压回弹 + 星光粒子 + 临时情绪。
@@ -287,7 +314,12 @@ export class AgentOrb {
 
     if (opts.onClick) btn.addEventListener('click', opts.onClick)
 
-    if (this._creature) {
+    if (this._skin) {
+      const skinKit = skinKits.get(this._skin)
+      if (opts.injectStyle !== false) injectStyle(doc, skinKit.css, skinKit.styleKey || 'data-agent-orb-skin')
+      btn.classList.add('ao-skin', `ao-skin-${this._skin}`)
+      btn.innerHTML = skinKit.svg(this._skin, this._id)
+    } else if (this._creature) {
       if (opts.injectStyle !== false) injectStyle(doc, creatureKit.css, 'data-agent-orb-creatures')
       btn.classList.add('ao-creature', `ao-creature-${this._creature}`)
       if (creatureKit.hasBeak(this._creature)) btn.classList.add('ao-has-beak')

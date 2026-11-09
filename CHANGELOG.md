@@ -2,6 +2,25 @@
 
 格式参考 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)。
 
+## [4.0.0] - 2026-11-08
+
+### 新增
+
+- **Crystal 皮肤 `skin: 'crystal'`（新的下一形态）**：白玉玻璃球 + 内部流动丝绸 + 无脸表态。
+  绸面用噪声高度场 + 漫反射光照织成（纯 SVG 滤镜，无 canvas / WebGL），六态靠波纹密度、流速、色相区分：
+  idle 珍珠白慢漂 / thinking 波纹变密 / working 流转加快 / asking 收拢泛紫 / done 染上暖金 / error 褪灰减速。
+  走可选插件 `import 'ai-orb/crystal'`（gzip 约 3 KB），不加载时核心与 3.x 完全一致
+- **皮肤注册表 `defineSkins`**：与生灵插件同一套按需加载机制，后续皮肤都走这条路。
+  `skin` 优先于 `creature`、`creature` 优先于 `shape`；新导出 `SKINS`
+- Crystal 细节：丝绸纹理每颗球独立 seed（同页多颗纹理会有变化）；光标划过时高光在玻璃内视差偏移；
+  滤镜与旋转动画分层；`prefers-reduced-motion` 下波纹静止
+- demo 新增 Crystal 展区（六态各一颗）与皮肤切换器；`scripts/shot-crystal.mjs` 视觉取证台、
+  `scripts/shot-recipes.mjs` 材质配方对比台（开发用，不进包）
+
+### 变更
+
+- 核心包新增皮肤插槽后 gzip 约 7.35 KB（门禁仍是 7.68 KB），生灵 / 经典用法零变化
+
 ## [3.0.1] - 2026-10-25
 
 ### 变更
