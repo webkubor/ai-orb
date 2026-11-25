@@ -31,6 +31,7 @@ jobs:
           mkdir -p _site
           cp demo/index.html _site/index.html
           cp demo/interaction.css _site/interaction.css
+          cp demo/analytics.js _site/analytics.js
           cp demo/embed* _site/
           sed -i "s|'../src/widget.js'|'./src/widget.js'|" _site/embed.js
           cp demo/showcase.html _site/showcase.html
